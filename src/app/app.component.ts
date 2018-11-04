@@ -1,3 +1,5 @@
+import { Candidate } from './models/candidate.model';
+import { FindMatchRequest } from './models/find-match-request.model';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -8,24 +10,11 @@ import { Component, OnInit } from '@angular/core';
 export class AppComponent implements OnInit {
   title = 'Find Your Match (serverless )';
   responseText = '';
-  candidates = {
-    candidate: {
-      name: 'ULA',
-      gender: 'm',
-      interests: 'ABC'
-    }
-  };
-
+  findMatchRequest;
 
   ngOnInit() {
-    console.log('1', this.candidates);
-    console.log('2', {
-      candidate: {
-        name: 'Ula',
-        gender: 'm',
-        interests: ' sports'
-      }
-    });
+    const candidate = new Candidate('a01', 'Ula', 'm', 'sports');
+    this.findMatchRequest = new FindMatchRequest(candidate);
 
     const that = this;
     const xhr = new XMLHttpRequest();
@@ -35,7 +24,7 @@ export class AppComponent implements OnInit {
       that.responseText = event.target.responseText;
     };
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(that.candidates));
+    xhr.send(JSON.stringify(this.findMatchRequest));
 
   }
 }
