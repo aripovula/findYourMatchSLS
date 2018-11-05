@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
   findMatchRequest;
 
   ngOnInit() {
-    const candidate = new Candidate('a01', 'Ula', 'm', 'sports');
+    const candidate = new Candidate('a01', 'Ula A', 'male', 'sports, arts, literature');
     this.findMatchRequest = new FindMatchRequest(candidate);
 
     const that = this;
@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
     xhr.open('POST', 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match');
     xhr.onreadystatechange = function (event: any) {
       // console.log('XMLHttpRequest event.target = ', event.target.responseText);
-      that.responseText1 = event.target.responseText;
+      that.responseText1 = event.target.response;
     };
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(this.findMatchRequest));

@@ -1,0 +1,9 @@
+// mapping template
+
+#set($inputRoot = $input.path('$'))
+{
+    "id" : "$inputRoot.candidate.id",
+    "name" : "$inputRoot.candidate.name",
+    "interests" : "$inputRoot.candidate.interests",
+    "gender" : "$inputRoot.candidate.gender"
+}
