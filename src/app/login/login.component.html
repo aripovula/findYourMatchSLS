@@ -9,7 +9,7 @@
       <!-- image source: https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-sign-up.html -->
       <img src="../../assets/lambda-pre-sign-up.png" height="160px;">
     </span>
-    <span>&lt; -- uses pre-sign up lambda</span>
+    <span>&lt; -- uses 'pre-sign up' lambda *</span>
     <br/>
     <br/>
     <div style="background-color: rgb(229, 244, 245);">
@@ -66,4 +66,24 @@
       </form>
     </div>
   </div>
+
+  <form [formGroup]="modalForm">
+    <div *ngIf="modalForm.get('isSignInSignUpError').value">
+      <div id="myModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="close" (click)="onModalClose()">&times;</span>
+            <p>Find Your Match - Warning</p>
+          </div>
+          <div class="modal-body">
+            <p>{{modalForm.get('SignInSignUpErrorMessage').value}}</p>
+            <br/>
+            <button type="button" class="button button1" (click)="onModalClose()()">Cancel</button>
+            <br/>
+            <br/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
 </div>

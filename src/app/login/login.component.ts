@@ -15,6 +15,10 @@ export class LoginComponent implements OnInit {
     password: new FormControl('alexAlex1', [Validators.required, Validators.minLength(8)]),
     user: new FormControl('Alex'),
   });
+  modalForm = new FormGroup({
+    isSignInSignUpError: new FormControl(false),
+    SignInSignUpErrorMessage: new FormControl('')
+  });
   prevUser = null;
 
   constructor(
@@ -55,11 +59,31 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  onModalClose() {
+    this.modalForm.setValue({
+      isSignInSignUpError: false,
+      SignInSignUpErrorMessage: ''
+    }, { emitEvent: false });
+
+  }
+
   onSubmit() {
     console.warn(this.loginForm.value);
     const email = this.loginForm.value.username;
     const password = this.loginForm.value.password;
     console.log('in Login C ' + email + ' ' + password);
-    this.authService.signInOrSignUp(email, password);
+    const that = this;
+    this.authService.signInOrSignUp(email, password).then((message: string) => {
+      console.log('that.SignInSignUpErrorMessage = ', message);
+      if (message.length > 0) {
+        this.modalForm.setValue({
+          isSignInSignUpError: true,
+          SignInSignUpErrorMessage: message
+        }, { emitEvent: false });
+      }
+
+    });
+
+    // isSignInSignUpError
   }
 }
