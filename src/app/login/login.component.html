@@ -1,0 +1,69 @@
+<div>
+  <div style="margin-left: 80px; margin-right: 80px; padding:15px;">
+
+    <!-- source: https://pixabay.com/en/cloud-computer-hosting-3406627/ -->
+    <!-- Free for commercial use. No attribution required -->
+    <img src="../../assets/cloud.jpg" height="200px;">
+    <span class="horIndent"></span>
+    <span>
+      <!-- image source: https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-sign-up.html -->
+      <img src="../../assets/lambda-pre-sign-up.png" height="160px;">
+    </span>
+    <span>&lt; -- uses pre-sign up lambda</span>
+    <br/>
+    <br/>
+    <div style="background-color: rgb(229, 244, 245);">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div style="padding:15px;">
+          <div class="form-element">
+            <label></label>
+            <span>
+              <b>Unlock the CLOUD with AWS Cognito:</b>
+            </span>
+            <img style="float: right" src="../../assets/Amazon-Cognito.png" height="100px;">
+            <br/>
+            <br/>
+            <label>username:</label>
+            <input type="text" formControlName="username">
+            <div class="warning margin110" *ngIf="!loginForm.get('username').valid && loginForm.get('username').touched">
+              please type a valid e-mail
+            </div>
+          </div>
+          <br/>
+          <div class="form-element">
+            <label>password:</label>
+            <input type="password" formControlName="password">
+            <div class="warning  margin110" *ngIf="!loginForm.get('password').valid && loginForm.get('password').touched">
+              Password should be at least 8 characters long, should have numbers and uppercase and lowercase letters
+            </div>
+          </div>
+          <br/>
+          <div style="margin-left: 110px;">
+            <label>
+              <input type="radio" name='user' value='Alex' formControlName="user" (ngModelChange)="onUserChange()"> sign in as Alex</label>
+          </div>
+          <div style="margin-left: 110px;">
+            <label>
+              <input type="radio" name='user' value='Ann' formControlName="user" (ngModelChange)="onUserChange()"> sign in as Ann</label>
+          </div>
+          <div style="margin-left: 110px;">
+            <label>
+              <input type="radio" name='user' value='John' formControlName="user" (ngModelChange)="onUserChange()"> sign in as John</label>
+          </div>
+          <div style="margin-left: 110px;">
+            <label>
+              <input type="radio" name='user' value='new' formControlName="user" (ngModelChange)="onUserChange()"> sign in as a new user (type your e-mail above. Changing standard password is optional)</label>
+          </div>
+          <span style="font-size: 12px; margin-left: 110px;">* by default Cognito requires sign-up verification. Pre sign-up lambda eliminates this need in this demo version</span>
+          <br/>
+          <br/>
+          <div class="form-element">
+            <label></label>
+            <button class="button button1" type="submit" [disabled]="!loginForm.valid">Sign In / Sign Up</button>
+          </div>
+          <br/>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
