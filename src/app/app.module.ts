@@ -13,6 +13,7 @@ import { CognitoService } from './services/cognito.service';
 const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: AppComponent },
+  { path: 'all_users_admin_only', component: AllUsersComponent },
 
   { path: 'not-found', component: NotFoundComponent },
   { path: '**', redirectTo: '/not-found' }

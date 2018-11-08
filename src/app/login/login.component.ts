@@ -38,7 +38,7 @@ export class LoginComponent implements OnInit {
       this.prevUser = this.loginForm.value.user;
       if (this.loginForm.value.user === 'Alex') {
         this.loginForm.setValue({
-          username: 'Alex', password: 'alexalex1', user: 'Alex'
+          username: 'Alex', password: 'alexAlex1', user: 'Alex'
         }, { emitEvent: false });
       }
       if (this.loginForm.value.user === 'Ann') {
@@ -73,7 +73,7 @@ export class LoginComponent implements OnInit {
     const password = this.loginForm.value.password;
     console.log('in Login C ' + email + ' ' + password);
     const that = this;
-    this.authService.signInOrSignUp(email, password).then((message: string) => {
+    this.authService.signIn(email, password).then((message: string) => {
       console.log('that.SignInSignUpErrorMessage = ', message);
       if (message.length > 0) {
         this.modalForm.setValue({

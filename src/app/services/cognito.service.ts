@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { CognitoUserPool, CognitoUserAttribute, CognitoUser } from 'amazon-cognito-identity-js';
+import { CognitoUserPool, CognitoUserAttribute, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
 // import { Subject } from 'rxjs/internal/Subject';
 // import { Observable } from 'rxjs/internal/Observable';
@@ -14,14 +14,16 @@ export class CognitoService {
     UserPoolId: 'us-east-2_XUFaLomWO',
     ClientId: '531ogvs2lm67fnifmvmd3mjnv4'
   };
+  userPool = new CognitoUserPool(this.poolData);
+
   cognitoUser: CognitoUser;
   constructor(private router: Router) { }
 
-  signInOrSignUp(userName, password) {
+  signUp(userName, password) {
     return new Promise((resolve, reject) => {
       let message = '';
       const attributeList: CognitoUserAttribute[] = [];
-      const userPool = new CognitoUserPool(this.poolData);
+
       const user = {
         userName,
         password
@@ -34,7 +36,7 @@ export class CognitoService {
 
       attributeList.push(new CognitoUserAttribute(dataPreferredUsername));
 
-      userPool.signUp(user.userName, user.password, attributeList, null, (err, result) => {
+      this.userPool.signUp(user.userName, user.password, attributeList, null, (err, result) => {
         if (err) {
           message = err.message || JSON.stringify(err);
           // alert(message);
@@ -49,6 +51,72 @@ export class CognitoService {
     });
   }
 
+  signIn(userName, password) {
+    const that = this;
+    return new Promise((resolve, reject) => {
+      // let message = '';
+
+      const authenticationData = {
+        Username: userName,
+        Password: password,
+      };
+      const authenticationDetails = new AuthenticationDetails(authenticationData);
+      const userData = {
+        Username: userName,
+        Pool: this.userPool
+      };
+      const cognitoUser = new CognitoUser(userData);
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: function (result) {
+          // const accessToken = result.getAccessToken().getJwtToken();
+          console.log('Logged in ');
+          that.router.navigate(['/all_users_admin_only']);
+        },
+
+        onFailure: function (err) {
+          console.log(err.message || JSON.stringify(err));
+          that.signUp(userName, password);
+        },
+      });
+    });
+  }
+
+  getCurrentUser() {
+    return this.userPool.getCurrentUser();
+  }
+
+  isCurrentUserAuthenticated() {
+    this.cognitoUser = this.getCurrentUser();
+    if (this.cognitoUser == null) {
+      return false;
+    } else {
+      this.cognitoUser.getSession( (err, session) => {
+        if (err) {
+          alert(err.message || JSON.stringify(err));
+          return false;
+        } else {
+          if (session.isValid()) {
+            this.cognitoUser.getUserAttributes(function (err2, attributes) {
+              if (err2) {
+                // Handle error
+              } else {
+                console.log('attributes = ' + attributes);
+              }
+            });
+          return true;
+          } else {
+            return false;
+          }
+        }
+      });
+    }
+  }
+
+  logOut() {
+    this.cognitoUser = this.getCurrentUser();
+    this.cognitoUser.signOut();
+    this.router.navigate(['/home']);
+  }
 }
 
 
