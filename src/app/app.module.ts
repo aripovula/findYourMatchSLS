@@ -1,13 +1,14 @@
-import { DataService } from './services/data.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { AllUsersComponent } from './all-users/all-users.component';
+import { DataService } from './services/data.service';
 import { CognitoService } from './services/cognito.service';
 
 const appRoutes: Routes = [
@@ -25,11 +26,12 @@ const appRoutes: Routes = [
     AppComponent,
     LoginComponent,
     NotFoundComponent,
-    AllUsersComponent
+    AllUsersComponent,
   ],
   imports: [
     BrowserModule,
     ReactiveFormsModule,
+    HttpModule,
     RouterModule.forRoot(
       appRoutes
     )

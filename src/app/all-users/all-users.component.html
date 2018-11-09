@@ -3,9 +3,23 @@
   <h1>
     Welcome to {{ title }}!
   </h1>
-<br/>
-<h3>Response 1 : {{responseText1}}</h3>
-<h3>Response 2 : {{responseText2}}</h3>
-<h3>Response 3 : {{responseText3}}</h3>
-<router-outlet></router-outlet>
+  <br/>
+  <h3>
+    <button class="button button1" (click)="onPostClicked()">post</button>
+    Post result : {{responseText1}}
+  </h3>
+
+  <h3>
+    <button class="button button1" (click)="onDeleteClicked()">delete</button>
+    Delete result : {{responseText2}}
+  </h3>
+
+  <h3>
+    <button class="button button1" (click)="onGetAllClicked()">get all</button>
+    Get all : {{responseText3}}
+  </h3>
+
+  <h3>
+    <button class="button button1" (click)="onGetSingleClicked()">get single</button>
+    Get single : {{responseText3}}</h3>
 </div>

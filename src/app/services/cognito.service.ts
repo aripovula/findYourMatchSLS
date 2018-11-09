@@ -85,12 +85,33 @@ export class CognitoService {
     return this.userPool.getCurrentUser();
   }
 
+  getUserData() {
+    return this.cognitoUser;
+  }
+
+  isSessionValid() {
+    if (this.cognitoUser == null) {
+      this.cognitoUser = this.getCurrentUser();
+    }
+    if (this.cognitoUser != null) {
+      this.cognitoUser.getSession((err, session) => {
+        if (err) {
+          alert(err.message || JSON.stringify(err));
+          return false;
+        } else if (session.isValid()) {
+          return true;
+        }
+        return false;
+      });
+    }
+  }
+
   isCurrentUserAuthenticated() {
     this.cognitoUser = this.getCurrentUser();
     if (this.cognitoUser == null) {
       return false;
     } else {
-      this.cognitoUser.getSession( (err, session) => {
+      this.cognitoUser.getSession((err, session) => {
         if (err) {
           alert(err.message || JSON.stringify(err));
           return false;
@@ -103,7 +124,7 @@ export class CognitoService {
                 console.log('attributes = ' + attributes);
               }
             });
-          return true;
+            return true;
           } else {
             return false;
           }
@@ -114,8 +135,23 @@ export class CognitoService {
 
   logOut() {
     this.cognitoUser = this.getCurrentUser();
-    this.cognitoUser.signOut();
-    this.router.navigate(['/home']);
+    this.cognitoUser.getSession((err, result) => {
+      if (err) {
+        console.log('failed to get the user session', err);
+        return;
+      }
+
+      this.cognitoUser.globalSignOut({
+        onSuccess: function (result2) {
+          console.log('Global SignOut - success');
+        },
+
+        onFailure: function (err2) {
+          console.log('Global SignOut - failure', err2);
+        },
+      });
+      this.router.navigate(['/home']);
+    });
   }
 }
 

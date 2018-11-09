@@ -1,3 +1,4 @@
+import { CognitoService } from './services/cognito.service';
 import { Candidate } from './models/candidate.model';
 import { FindMatchRequest } from './models/find-match-request.model';
 import { Component, OnInit } from '@angular/core';
@@ -16,17 +17,30 @@ export class AppComponent implements OnInit {
   findMatchRequest;
 
   constructor(
+    private authService: CognitoService,
     private router: Router,
   ) { }
 
   ngOnInit() {
-    this.router.navigate(['/login']);
 
+    // this.router.navigate(['/login']);
+
+  }
+
+  onCheckClicked() {
+    const isLoggedIn = this.authService.isSessionValid();
+    console.log('isLoggedIn 22 = ', isLoggedIn);
+    const userData = this.authService.getUserData();
+    console.log('isLoggedIn 33 = ', userData);
   }
 
   onSourceClicked() {
     console.log('in onSourceClicked');
     window.open('https://github.com/aripovula/findYourMatchSLS', '_blank');
+  }
+
+  onLogoutClicked() {
+    this.authService.logOut();
   }
 
 }
