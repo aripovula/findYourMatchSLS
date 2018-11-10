@@ -1,8 +1,8 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
+  <h3>
+    All users list (admin only)
+  </h3>
   <br/>
   <h3>
     <button class="button button1" (click)="onPostClicked()">post</button>
@@ -13,13 +13,9 @@
     <button class="button button1" (click)="onDeleteClicked()">delete</button>
     Delete result : {{responseText2}}
   </h3>
-
+  
   <h3>
-    <button class="button button1" (click)="onGetAllClicked()">get all</button>
-    Get all : {{responseText3}}
-  </h3>
-
-  <h3>
-    <button class="button button1" (click)="onGetSingleClicked()">get single</button>
-    Get single : {{responseText3}}</h3>
+      <button class="button button1" (click)="onGetAllClicked()">get all</button>
+      <button class="button button1" (click)="onGetSingleClicked()">get single</button>
+    Get result: {{responseText3}}</h3>
 </div>

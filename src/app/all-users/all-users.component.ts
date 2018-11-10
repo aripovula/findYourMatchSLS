@@ -11,8 +11,12 @@ import { DataService } from './../services/data.service';
 
 export class AllUsersComponent implements OnInit {
 
+  responseText1 = '';
+  responseText2 = '';
+  responseText3 = '';
   abc = 0;
   id = 'a21';
+
   constructor(private dataService: DataService) { }
 
   ngOnInit() {
@@ -24,15 +28,29 @@ export class AllUsersComponent implements OnInit {
   }
 
   onGetAllClicked() {
-    this.dataService.get('all');
+    this.dataService.get('all')
+      .then((data) => {
+        console.log('data = ' + data);
+        this.responseText3 = data[0].interests + ', ' + data[1].interests;
+      })
+      .catch((error) => {
+        console.log('error - ', error);
+      });
   }
 
   onGetSingleClicked() {
-    this.dataService.get('single');
+    this.dataService.get('single')
+      .then((data) => {
+        console.log('data = ' + data);
+
+        this.responseText3 = data.toString();
+      })
+      .catch((error) => {
+        console.log('error - ', error);
+      });
   }
 
-  deleteAUser() {
-    this.dataService.delete(this.id);
+  onDeleteClicked() {
+    this.dataService.delete('a21');
   }
-
 }

@@ -9,9 +9,6 @@ import { Http, Headers, Response } from '@angular/http';
 })
 export class DataService {
 
-  responseText1 = '';
-  responseText2 = '';
-  responseText3 = '';
   findMatchRequest: FindMatchRequest;
 
   constructor(private http: Http, private authService: CognitoService) { }
@@ -29,11 +26,11 @@ export class DataService {
 
       that.http.post('https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match',
         that.findMatchRequest, {
-          headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken()})
+          headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
         })
         .subscribe(
-          (result) => {
-            // that.responseText3 = JSON.parse(result.json);
+          (result: any) => {
+            // that.responseText1 = JSON.parse(result.json);
             console.log('result = ', result);
           },
           (error) => {
@@ -61,38 +58,79 @@ export class DataService {
   delete(id: string) {
     // DELETE
     const that = this;
-    const xhr2 = new XMLHttpRequest();
-    xhr2.open('DELETE', 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match');
-    xhr2.onreadystatechange = function (event: any) {
-      // console.log('XMLHttpRequest event.target = ', event.target.responseText);
-      that.responseText2 = event.target.responseText;
-    };
-    xhr2.setRequestHeader('Content-Type', 'application/json');
-    xhr2.send();
+
+    this.authService.getCurrentUser().getSession((err, session) => {
+      console.log('JWT token ', session.getIdToken().getJwtToken());
+
+      that.http.delete(
+        'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match?accessToken='
+        + session.getAccessToken().getJwtToken() + '&candidateID=' + id,
+        {
+          headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
+        })
+        .subscribe(
+          (result: any) => {
+            // that.responseText2 = JSON.parse(result.json);
+            console.log('result = ', result);
+          },
+          (error) => {
+          }
+        );
+    });
+
+
+    // const xhr2 = new XMLHttpRequest();
+    // xhr2.open('DELETE', 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match');
+    // xhr2.onreadystatechange = function (event: any) {
+    //   // console.log('XMLHttpRequest event.target = ', event.target.responseText);
+    //   that.responseText2 = event.target.responseText;
+    // };
+    // xhr2.setRequestHeader('Content-Type', 'application/json');
+    // xhr2.send();
 
   }
 
   get(type: string) {
     // GET
     console.log('type', type);
-
     const that = this;
-    const xhr3 = new XMLHttpRequest();
-    xhr3.open('GET', 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match/' + type);
-    let times = 0;
-    xhr3.onreadystatechange = function (event: any) {
-      if (event.target.response) {
-        try {
-          times++;
-          that.responseText3 = JSON.parse(event.target.response);
-          console.log('XMLHttpRequest event.target = ', times, that.responseText3);
-        } catch (e) {
-          console.log('Error in parse attemp # ' + times);
-        }
-      }
-    };
-    xhr3.setRequestHeader('Content-Type', 'application/json');
-    xhr3.send();
+    return new Promise((resolve, reject) => {
+      this.authService.getCurrentUser().getSession((err, session) => {
+        console.log('JWT token ', session.getIdToken().getJwtToken());
+
+        that.http.get('https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match/' + type,
+          {
+            headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
+          })
+          .subscribe(
+            (result: any) => {
+              const data = JSON.parse(result._body);
+              console.log('result = ', data);
+              resolve(data);
+            },
+            (error) => {
+              reject(error);
+            }
+          );
+      });
+    });
+
+    // const xhr3 = new XMLHttpRequest();
+    // xhr3.open('GET', 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match/' + type);
+    // let times = 0;
+    // xhr3.onreadystatechange = function (event: any) {
+    //   if (event.target.response) {
+    //     try {
+    //       times++;
+    //       that.responseText3 = JSON.parse(event.target.response);
+    //       console.log('XMLHttpRequest event.target = ', times, that.responseText3);
+    //     } catch (e) {
+    //       console.log('Error in parse attemp # ' + times);
+    //     }
+    //   }
+    // };
+    // xhr3.setRequestHeader('Content-Type', 'application/json');
+    // xhr3.send();
   }
 
 }
