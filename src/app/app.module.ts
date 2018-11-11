@@ -10,6 +10,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { AllUsersComponent } from './all-users/all-users.component';
 import { DataService } from './services/data.service';
 import { CognitoService } from './services/cognito.service';
+import { FindMatchFormComponent } from './find-match-form/find-match-form.component';
 
 const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -27,6 +28,7 @@ const appRoutes: Routes = [
     LoginComponent,
     NotFoundComponent,
     AllUsersComponent,
+    FindMatchFormComponent,
   ],
   imports: [
     BrowserModule,
