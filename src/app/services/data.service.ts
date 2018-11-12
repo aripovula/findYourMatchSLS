@@ -13,6 +13,8 @@ export class DataService {
 
   constructor(private http: Http, private authService: CognitoService) { }
 
+  // Code of all Lambda functions in AWS Lambda are also provided in AWS-BACK-UP folder in this repository
+
   post(candidate: Candidate) {
     // const candidate = new Candidate('a04', 'Ula B', 'male', 'sports, arts, acting');
     this.findMatchRequest = new FindMatchRequest(candidate);
@@ -24,7 +26,8 @@ export class DataService {
     this.authService.getCurrentUser().getSession((err, session) => {
       console.log('JWT token ', session.getIdToken().getJwtToken());
 
-      that.http.post('https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match',
+      that.http.post('https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match'
+        + '?accessToken=' + session.getAccessToken().getJwtToken(),
         that.findMatchRequest, {
           headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
         })
@@ -63,8 +66,9 @@ export class DataService {
       console.log('JWT token ', session.getIdToken().getJwtToken());
 
       that.http.delete(
-        'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match?accessToken='
-        + session.getAccessToken().getJwtToken() + '&candidateID=' + id,
+        'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match'
+        + '?accessToken=' + session.getAccessToken().getJwtToken()
+        + '&candidateID=' + id,
         {
           headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
         })
@@ -90,15 +94,17 @@ export class DataService {
 
   }
 
-  get(type: string) {
+  get(type: string, id: string) {
     // GET
     console.log('type', type);
     const that = this;
     return new Promise((resolve, reject) => {
       this.authService.getCurrentUser().getSession((err, session) => {
         console.log('JWT token ', session.getIdToken().getJwtToken());
-
-        that.http.get('https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match/' + type,
+        that.http.get('https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match/'
+          + type
+          + '?accessToken=' + session.getAccessToken().getJwtToken()
+          + '&candidateID=' + id,
           {
             headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
           })

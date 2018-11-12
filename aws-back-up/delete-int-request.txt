@@ -3,7 +3,6 @@
 
 
 {
-    "type" : "$input.params('type')",
     "accessToken" : "$input.params('accessToken')",
     "candidateID" : "$input.params('candidateID')"
 }

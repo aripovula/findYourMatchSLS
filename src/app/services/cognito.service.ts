@@ -19,6 +19,8 @@ export class CognitoService {
   cognitoUser: CognitoUser;
   constructor(private router: Router) { }
 
+  // Code of all Lambda functions in AWS Lambda are also provided in AWS-BACK-UP folder in this repository
+
   signUp(userName, password) {
     return new Promise((resolve, reject) => {
       let message = '';

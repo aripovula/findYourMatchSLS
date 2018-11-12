@@ -17,6 +17,8 @@ exports.handler = (event, context, callback) => {
     const cispParams = {
         "AccessToken": accessToken
     };
+
+    // user is not used - token is validated before allowing to make a record in DynamoDB
     cisp.getUser(cispParams, (err, result) => {
         if (err) {
             console.log(err);

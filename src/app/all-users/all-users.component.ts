@@ -11,11 +11,12 @@ import { DataService } from './../services/data.service';
 
 export class AllUsersComponent implements OnInit {
 
+  users = [];
   responseText1 = '';
   responseText2 = '';
   responseText3 = '';
   abc = 0;
-  id = 'a21';
+  id = 'a14';
 
   constructor(private dataService: DataService) { }
 
@@ -28,18 +29,19 @@ export class AllUsersComponent implements OnInit {
   }
 
   onGetAllClicked() {
-    this.dataService.get('all')
-      .then((data) => {
-        console.log('data = ' + data);
-        this.responseText3 = data[0].interests + ', ' + data[1].interests;
+    this.dataService.get('all', '0')
+      .then((data: Candidate[]) => {
+        this.users = data;
+        console.log('data = ' + this.users);
+        this.responseText3 = this.users[0].interests + ', ' + this.users[1].interests;
       })
       .catch((error) => {
         console.log('error - ', error);
       });
   }
 
-  onGetSingleClicked() {
-    this.dataService.get('single')
+  onGetSingleClicked(id) {
+    this.dataService.get('single', id)
       .then((data) => {
         console.log('data = ' + data);
 
@@ -51,6 +53,6 @@ export class AllUsersComponent implements OnInit {
   }
 
   onDeleteClicked() {
-    this.dataService.delete('a21');
+    this.dataService.delete(this.id);
   }
 }

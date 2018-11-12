@@ -10,6 +10,9 @@ import { CognitoService } from './../services/cognito.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
+
+  // Code of all Lambda functions in AWS Lambda are also provided in AWS-BACK-UP folder in this repository
+
   loginForm = new FormGroup({
     username: new FormControl('Alex', [Validators.required, Validators.minLength(3)]),
     password: new FormControl('alexAlex1', [Validators.required, Validators.minLength(8)]),
