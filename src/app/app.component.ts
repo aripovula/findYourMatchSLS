@@ -1,8 +1,7 @@
-import { CognitoService } from './services/cognito.service';
-import { Candidate } from './models/candidate.model';
-import { FindMatchRequest } from './models/find-match-request.model';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { CognitoService } from './services/cognito.service';
 
 @Component({
   selector: 'app-root',
@@ -10,11 +9,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'Find Your Match (serverless )';
-  responseText1 = '';
-  responseText2 = '';
-  responseText3 = '';
-  findMatchRequest;
+  isLoggedIn = false;
 
   constructor(
     private authService: CognitoService,
@@ -23,8 +18,25 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
 
-    // this.router.navigate(['/login']);
+    this.authService.isSessionValid();
+    console.log('sent to this.isSessionValid();');
 
+    this.authService.subscribeToStatus();
+    this.isLoggedIn = this.authService.isLoggedIn;
+    console.log(this.isLoggedIn);
+
+    this.authService.isLoggedInSubject.subscribe(
+      (authenticated) => {
+        this.isLoggedIn = authenticated;
+        console.log('authenticated in appc = ', authenticated);
+
+        if (authenticated) {
+          this.router.navigate(['/home']);
+        } else {
+          this.router.navigate(['/login']);
+        }
+      }
+    );
   }
 
   onCheckClicked() {

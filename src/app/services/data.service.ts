@@ -24,12 +24,14 @@ export class DataService {
     // const xhr = new XMLHttpRequest();
 
     this.authService.getCurrentUser().getSession((err, session) => {
-      console.log('JWT token ', session.getIdToken().getJwtToken());
+      console.log('ID token ', session.getIdToken().getJwtToken());
+      console.log('ACCESS token ', session.getAccessToken().getJwtToken());
 
       that.http.post('https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development/find-your-match'
         + '?accessToken=' + session.getAccessToken().getJwtToken(),
         that.findMatchRequest, {
-          headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
+          headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken()
+        })
         })
         .subscribe(
           (result: any) => {

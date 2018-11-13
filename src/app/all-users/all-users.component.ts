@@ -33,7 +33,7 @@ export class AllUsersComponent implements OnInit {
       .then((data: Candidate[]) => {
         this.users = data;
         console.log('data = ' + this.users);
-        this.responseText3 = this.users[0].interests + ', ' + this.users[1].interests;
+        // this.responseText3 = this.users[0].interests + ', ' + this.users[1].interests;
       })
       .catch((error) => {
         console.log('error - ', error);
@@ -42,10 +42,11 @@ export class AllUsersComponent implements OnInit {
 
   onGetSingleClicked(id) {
     this.dataService.get('single', id)
-      .then((data) => {
+      .then((data: Candidate[]) => {
         console.log('data = ' + data);
+        this.users.push(data);
 
-        this.responseText3 = data.toString();
+        // this.responseText3 = data.toString();
       })
       .catch((error) => {
         console.log('error - ', error);

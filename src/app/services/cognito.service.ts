@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CognitoUserPool, CognitoUserAttribute, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
-// import { Subject } from 'rxjs/internal/Subject';
+import { Subject } from 'rxjs/internal/Subject';
 // import { Observable } from 'rxjs/internal/Observable';
 // import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 
@@ -15,13 +15,17 @@ export class CognitoService {
     ClientId: '531ogvs2lm67fnifmvmd3mjnv4'
   };
   userPool = new CognitoUserPool(this.poolData);
-
+  isLoggedInSubject = new Subject<boolean>();
+  isLoggedIn = false;
+  isNotFirstTime = false;
   cognitoUser: CognitoUser;
+
   constructor(private router: Router) { }
 
   // Code of all Lambda functions in AWS Lambda are also provided in AWS-BACK-UP folder in this repository
 
   signUp(userName, password) {
+    const that = this;
     return new Promise((resolve, reject) => {
       let message = '';
       const attributeList: CognitoUserAttribute[] = [];
@@ -38,14 +42,16 @@ export class CognitoService {
 
       attributeList.push(new CognitoUserAttribute(dataPreferredUsername));
 
-      this.userPool.signUp(user.userName, user.password, attributeList, null, (err, result) => {
+      that.userPool.signUp(user.userName, user.password, attributeList, null, (err, result) => {
         if (err) {
           message = err.message || JSON.stringify(err);
           // alert(message);
+          // that.isLoggedInSubject.next(false);
           resolve(message);
         } else {
-          this.cognitoUser = result.user;
-          console.log('user name is ' + this.cognitoUser.getUsername());
+          that.cognitoUser = result.user;
+          console.log('user name is ' + that.cognitoUser.getUsername());
+          that.isLoggedInSubject.next(true);
           resolve(message);
         }
       });
@@ -72,7 +78,8 @@ export class CognitoService {
         onSuccess: function (result) {
           // const accessToken = result.getAccessToken().getJwtToken();
           console.log('Logged in ');
-          that.router.navigate(['/all_users_admin_only']);
+          that.isLoggedInSubject.next(true);
+          // that.router.navigate(['/all_users_admin_only']);
         },
 
         onFailure: function (err) {
@@ -92,50 +99,67 @@ export class CognitoService {
   }
 
   isSessionValid() {
+    const that = this;
+    let isValid = false;
     if (this.cognitoUser == null) {
       this.cognitoUser = this.getCurrentUser();
+      if (this.cognitoUser == null) {
+        isValid = false;
+        that.isLoggedInSubject.next(isValid);
+        console.log('in 111');
+        return isValid;
+      }
     }
     if (this.cognitoUser != null) {
       this.cognitoUser.getSession((err, session) => {
         if (err) {
           alert(err.message || JSON.stringify(err));
-          return false;
+          isValid = false;
+          that.isLoggedInSubject.next(isValid);
+          console.log('in 222');
+          return isValid;
         } else if (session.isValid()) {
-          return true;
+          isValid = true;
+          that.isLoggedInSubject.next(isValid);
+          console.log('in 333');
+          return isValid;
         }
-        return false;
       });
     }
+    console.log('isValid last - ' + isValid);
+
+    return isValid;
   }
 
-  isCurrentUserAuthenticated() {
-    this.cognitoUser = this.getCurrentUser();
-    if (this.cognitoUser == null) {
-      return false;
-    } else {
-      this.cognitoUser.getSession((err, session) => {
-        if (err) {
-          alert(err.message || JSON.stringify(err));
-          return false;
-        } else {
-          if (session.isValid()) {
-            this.cognitoUser.getUserAttributes(function (err2, attributes) {
-              if (err2) {
-                // Handle error
-              } else {
-                console.log('attributes = ' + attributes);
-              }
-            });
-            return true;
-          } else {
-            return false;
-          }
-        }
-      });
-    }
-  }
+  // isCurrentUserAuthenticated() {
+  //   this.cognitoUser = this.getCurrentUser();
+  //   if (this.cognitoUser == null) {
+  //     return false;
+  //   } else {
+  //     this.cognitoUser.getSession((err, session) => {
+  //       if (err) {
+  //         alert(err.message || JSON.stringify(err));
+  //         return false;
+  //       } else {
+  //         if (session.isValid()) {
+  //           this.cognitoUser.getUserAttributes(function (err2, attributes) {
+  //             if (err2) {
+  //               // Handle error
+  //             } else {
+  //               console.log('attributes = ' + attributes);
+  //             }
+  //           });
+  //           return true;
+  //         } else {
+  //           return false;
+  //         }
+  //       }
+  //     });
+  //   }
+  // }
 
   logOut() {
+    const that = this;
     this.cognitoUser = this.getCurrentUser();
     this.cognitoUser.getSession((err, result) => {
       if (err) {
@@ -143,8 +167,9 @@ export class CognitoService {
         return;
       }
 
-      this.cognitoUser.globalSignOut({
+      that.cognitoUser.globalSignOut({
         onSuccess: function (result2) {
+          that.isLoggedInSubject.next(false);
           console.log('Global SignOut - success');
         },
 
@@ -154,6 +179,14 @@ export class CognitoService {
       });
       this.router.navigate(['/home']);
     });
+  }
+
+  subscribeToStatus() {
+    this.isLoggedInSubject.subscribe(
+      (status) => {
+        this.isLoggedIn = status;
+      }
+    );
   }
 }
 

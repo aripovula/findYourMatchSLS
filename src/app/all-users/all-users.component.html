@@ -20,4 +20,7 @@
     Get result: {{responseText3}}
   </h3>
 
+  <div *ngFor="let user of users; let ind = index;">
+    Name: {{user.name}}, gender: {{user.gender}}, interests: {{user.interests}}
+  </div>
 </div>

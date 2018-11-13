@@ -11,11 +11,12 @@ import { AllUsersComponent } from './all-users/all-users.component';
 import { DataService } from './services/data.service';
 import { CognitoService } from './services/cognito.service';
 import { FindMatchFormComponent } from './find-match-form/find-match-form.component';
+import { AuthGuard } from './services/auth-guard.service';
 
 const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'home', component: AppComponent },
-  { path: 'all_users_admin_only', component: AllUsersComponent },
+  { path: 'home', component: AppComponent, canActivate: [AuthGuard] },
+  { path: 'all_users_admin_only', component: AllUsersComponent, canActivate: [AuthGuard] },
 
   { path: 'not-found', component: NotFoundComponent },
   { path: '**', redirectTo: '/not-found' }
@@ -38,7 +39,7 @@ const appRoutes: Routes = [
       appRoutes
     )
   ],
-  providers: [CognitoService, DataService],
+  providers: [CognitoService, DataService, AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
