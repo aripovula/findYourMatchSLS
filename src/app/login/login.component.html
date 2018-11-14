@@ -67,23 +67,4 @@
     </div>
   </div>
 
-  <form [formGroup]="modalForm">
-    <div *ngIf="modalForm.get('isSignInSignUpError').value">
-      <div id="myModal" class="modal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <span class="close" (click)="onModalClose()">&times;</span>
-            <p>Find Your Match - Warning</p>
-          </div>
-          <div class="modal-body">
-            <p>{{modalForm.get('SignInSignUpErrorMessage').value}}</p>
-            <br/>
-            <button type="button" class="button button1" (click)="onModalClose()()">Cancel</button>
-            <br/>
-            <br/>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
 </div>

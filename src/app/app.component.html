@@ -1,28 +1,56 @@
-<div class="header header__content fixedElement">
-  <span class="horIndent"></span>
-  <h4 style="color: white">Find Your Match - Serverless</h4>
+<div>
+  <div class="header header__content fixedElement">
+    <span class="horIndent"></span>
+    <h4 style="color: white">Find Your Match - Serverless</h4>
 
-  <nav>
-    <span class="horIndent"></span>
-    <!-- <a class="header__title" routerLink="/home" routerLinkActive="active-link">Home</a>
-    <span class="horIndent"></span>
-    <a class="header__title" routerLink="/start" routerLinkActive="active-link">Start</a>
-    <span class="horIndent"></span>
-    <a class="header__title" routerLink="/all_users_admin_only" routerLinkActive="active-link">All users - Admin only</a>
-    <span class="horIndent"></span> -->
-    isLoggedIn: {{isLoggedIn}}
-    <span *ngIf="isLoggedIn">
-      <a class="header__title" routerLink="/logout" routerLinkActive="active-link">Logout</a>
-      <span style="font-size: 12px; color: lightgray;"> &nbsp;( {{username}} is logged in )</span>
-    </span>
-    <span class="horIndent"></span><span class="horIndent"></span><span class="horIndent"></span>
-    <a class="header__title" style="cursor: pointer;" (click)="onSourceClicked()">source code on Github</a>
-    <a class="header__title" style="cursor: pointer;" (click)="onCheckClicked()">check if logged in</a>
-    <a class="header__title" style="cursor: pointer;" (click)="onLogoutClicked()">Logout</a>
-    
-  </nav>
+    <nav>
+      <span class="horIndent"></span>
+      <a class="header__title" routerLink="/home" routerLinkActive="active-link">Home</a>
+      <span class="horIndent"></span>
+      <a class="header__title" routerLink="/start" routerLinkActive="active-link">Start</a>
+      <span class="horIndent"></span>
+      <a class="header__title" routerLink="/all_users_admin_only" routerLinkActive="active-link">All users</a>
+      <span class="horIndent"></span>
+      <span *ngIf="isLoggedIn">
+        <a class="header__title" style="cursor: pointer;" (click)="onLogoutClicked()">Logout</a>
+
+        <span *ngIf="username">
+          <span style="font-size: 12px; color: lightgray;"> &nbsp;( {{username}} is logged in )</span>
+        </span>
+      </span>
+      <span class="horIndent"></span>
+      <span class="horIndent"></span>
+      <span class="horIndent"></span>
+      <a class="header__title" style="cursor: pointer;" (click)="onSourceClicked()">source code on Github</a>
+      <!-- <a class="header__title" style="cursor: pointer;" (click)="onCheckClicked()">check if logged in</a> -->
+
+
+    </nav>
+  </div>
+  <br/>
+  <br/>
+  <br/> Name: {{username}}
+  <br/> AT Home
+  <router-outlet></router-outlet>
+  <!-- <ng4-loading-spinner [timeout]="20000" [loadingText]="'Loading data. Please wait...'"> </ng4-loading-spinner> -->
+
+  <form [formGroup]="modalForm">
+    <div *ngIf="modalForm.get('isSignInSignUpError').value">
+      <div id="myModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="close" (click)="onModalClose()">&times;</span>
+            <p>Find Your Match - Warning</p>
+          </div>
+          <div class="modal-body">
+            <p>{{modalForm.get('SignInSignUpErrorMessage').value}}</p>
+            <br/>
+            <button type="button" class="button button1" (click)="onModalClose()()">Cancel</button>
+            <br/>
+            <br/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
 </div>
-<br/>
-
-<router-outlet></router-outlet>
-<!-- <ng4-loading-spinner [timeout]="20000" [loadingText]="'Loading data. Please wait...'"> </ng4-loading-spinner> -->

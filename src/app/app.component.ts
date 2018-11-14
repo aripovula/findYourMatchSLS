@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { CognitoService } from './services/cognito.service';
@@ -8,28 +9,28 @@ import { CognitoService } from './services/cognito.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   isLoggedIn = false;
+  username = '';
+
+  modalForm = new FormGroup({
+    isSignInSignUpError: new FormControl(false),
+    SignInSignUpErrorMessage: new FormControl('')
+  });
 
   constructor(
     private authService: CognitoService,
     private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
 
-    this.authService.isSessionValid();
-    console.log('sent to this.isSessionValid();');
-
     this.authService.subscribeToStatus();
-    this.isLoggedIn = this.authService.isLoggedIn;
-    console.log(this.isLoggedIn);
 
     this.authService.isLoggedInSubject.subscribe(
       (authenticated) => {
         this.isLoggedIn = authenticated;
-        console.log('authenticated in appc = ', authenticated);
-
         if (authenticated) {
           this.router.navigate(['/home']);
         } else {
@@ -37,13 +38,34 @@ export class AppComponent implements OnInit {
         }
       }
     );
+
+    this.authService.LoggedInUsername.subscribe((name) => {
+      this.username = name;
+    });
+
+    this.authService.ErrorMessage.subscribe((message: string) => {
+      console.log('that.SignInSignUpErrorMessage = ', message);
+      if (message.length > 0) {
+        this.modalForm.setValue({
+          isSignInSignUpError: true,
+          SignInSignUpErrorMessage: message
+        }, { emitEvent: false });
+      }
+    });
+
+    this.authService.isSessionValid();
   }
 
-  onCheckClicked() {
-    const isLoggedIn = this.authService.isSessionValid();
-    console.log('isLoggedIn 22 = ', isLoggedIn);
-    const userData = this.authService.getUserData();
-    console.log('isLoggedIn 33 = ', userData);
+  ngAfterViewInit() {
+    this.cdr.detectChanges();
+  }
+
+  onModalClose() {
+    console.log('in onModalClose');
+    this.modalForm.setValue({
+      isSignInSignUpError: false,
+      SignInSignUpErrorMessage: ''
+    }, { emitEvent: false });
   }
 
   onSourceClicked() {

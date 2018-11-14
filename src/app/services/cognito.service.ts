@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CognitoUserPool, CognitoUserAttribute, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
-import { Subject } from 'rxjs/internal/Subject';
+// import { Subject } from 'rxjs/internal/Subject';
 // import { Observable } from 'rxjs/internal/Observable';
-// import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,9 @@ export class CognitoService {
     ClientId: '531ogvs2lm67fnifmvmd3mjnv4'
   };
   userPool = new CognitoUserPool(this.poolData);
-  isLoggedInSubject = new Subject<boolean>();
+  isLoggedInSubject = new BehaviorSubject<boolean>(false);
+  LoggedInUsername = new BehaviorSubject<string>('');
+  ErrorMessage = new BehaviorSubject<string>('');
   isLoggedIn = false;
   isNotFirstTime = false;
   cognitoUser: CognitoUser;
@@ -24,46 +26,51 @@ export class CognitoService {
 
   // Code of all Lambda functions in AWS Lambda are also provided in AWS-BACK-UP folder in this repository
 
+  subscribeToStatus() {
+    console.log('in subscribeToStatus');
+    this.isLoggedInSubject.subscribe(
+      (status) => {
+        console.log('status = ', status);
+        this.isLoggedIn = status;
+      }
+    );
+  }
+
   signUp(userName, password) {
     const that = this;
-    return new Promise((resolve, reject) => {
-      let message = '';
-      const attributeList: CognitoUserAttribute[] = [];
+    let message = '';
+    const attributeList: CognitoUserAttribute[] = [];
 
-      const user = {
-        userName,
-        password
-      };
+    const user = {
+      userName,
+      password
+    };
 
-      const dataPreferredUsername = {
-        Name: 'preferred_username',
-        Value: user.userName
-      };
+    const dataPreferredUsername = {
+      Name: 'preferred_username',
+      Value: user.userName
+    };
 
-      attributeList.push(new CognitoUserAttribute(dataPreferredUsername));
+    attributeList.push(new CognitoUserAttribute(dataPreferredUsername));
 
-      that.userPool.signUp(user.userName, user.password, attributeList, null, (err, result) => {
-        if (err) {
-          message = err.message || JSON.stringify(err);
-          // alert(message);
-          // that.isLoggedInSubject.next(false);
-          resolve(message);
+    that.userPool.signUp(user.userName, user.password, attributeList, null, (err, result) => {
+      if (err) {
+        message = err.message || JSON.stringify(err);
+        that.ErrorMessage.next(message);
+      } else {
+        if (!that.isNotFirstTime) {
+          that.isNotFirstTime = true;
+          that.signIn(userName, password);
         } else {
-          that.cognitoUser = result.user;
-          console.log('user name is ' + that.cognitoUser.getUsername());
-          that.isLoggedInSubject.next(true);
-          resolve(message);
+          that.ErrorMessage.next('Sign you failed !');
         }
-      });
-      return;
+      }
     });
+    return;
   }
 
   signIn(userName, password) {
     const that = this;
-    return new Promise((resolve, reject) => {
-      // let message = '';
-
       const authenticationData = {
         Username: userName,
         Password: password,
@@ -76,10 +83,9 @@ export class CognitoService {
       const cognitoUser = new CognitoUser(userData);
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: function (result) {
-          // const accessToken = result.getAccessToken().getJwtToken();
           console.log('Logged in ');
           that.isLoggedInSubject.next(true);
-          // that.router.navigate(['/all_users_admin_only']);
+          that.isNotFirstTime = false;
         },
 
         onFailure: function (err) {
@@ -87,7 +93,7 @@ export class CognitoService {
           that.signUp(userName, password);
         },
       });
-    });
+
   }
 
   getCurrentUser() {
@@ -99,29 +105,30 @@ export class CognitoService {
   }
 
   isSessionValid() {
+    console.log('in isSessionValid');
+
     const that = this;
     let isValid = false;
-    if (this.cognitoUser == null) {
       this.cognitoUser = this.getCurrentUser();
+      console.log('this.cognitoUser = ', this.cognitoUser);
+
       if (this.cognitoUser == null) {
         isValid = false;
         that.isLoggedInSubject.next(isValid);
-        console.log('in 111');
         return isValid;
       }
-    }
+
     if (this.cognitoUser != null) {
       this.cognitoUser.getSession((err, session) => {
         if (err) {
-          alert(err.message || JSON.stringify(err));
+          that.ErrorMessage.next(err.message || JSON.stringify(err));
           isValid = false;
           that.isLoggedInSubject.next(isValid);
-          console.log('in 222');
           return isValid;
         } else if (session.isValid()) {
           isValid = true;
           that.isLoggedInSubject.next(isValid);
-          console.log('in 333');
+          that.LoggedInUsername.next(that.cognitoUser.getUsername());
           return isValid;
         }
       });
@@ -131,39 +138,12 @@ export class CognitoService {
     return isValid;
   }
 
-  // isCurrentUserAuthenticated() {
-  //   this.cognitoUser = this.getCurrentUser();
-  //   if (this.cognitoUser == null) {
-  //     return false;
-  //   } else {
-  //     this.cognitoUser.getSession((err, session) => {
-  //       if (err) {
-  //         alert(err.message || JSON.stringify(err));
-  //         return false;
-  //       } else {
-  //         if (session.isValid()) {
-  //           this.cognitoUser.getUserAttributes(function (err2, attributes) {
-  //             if (err2) {
-  //               // Handle error
-  //             } else {
-  //               console.log('attributes = ' + attributes);
-  //             }
-  //           });
-  //           return true;
-  //         } else {
-  //           return false;
-  //         }
-  //       }
-  //     });
-  //   }
-  // }
-
   logOut() {
     const that = this;
     this.cognitoUser = this.getCurrentUser();
     this.cognitoUser.getSession((err, result) => {
       if (err) {
-        console.log('failed to get the user session', err);
+        that.ErrorMessage.next(err.message || JSON.stringify(err));
         return;
       }
 
@@ -174,6 +154,7 @@ export class CognitoService {
         },
 
         onFailure: function (err2) {
+          that.ErrorMessage.next(err2.message || JSON.stringify(err));
           console.log('Global SignOut - failure', err2);
         },
       });
@@ -181,13 +162,6 @@ export class CognitoService {
     });
   }
 
-  subscribeToStatus() {
-    this.isLoggedInSubject.subscribe(
-      (status) => {
-        this.isLoggedIn = status;
-      }
-    );
-  }
 }
 
 
