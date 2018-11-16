@@ -44,6 +44,7 @@ export class AllUsersComponent implements OnInit {
     this.dataService.get('single', id)
       .then((data: Candidate[]) => {
         console.log('data = ' + data);
+        this.users = [];
         this.users.push(data);
 
         // this.responseText3 = data.toString();

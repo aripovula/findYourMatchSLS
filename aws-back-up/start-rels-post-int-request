@@ -1,0 +1,4 @@
+{
+    "input": "$util.escapeJavaScript($input.json('$'))",
+    "stateMachineArn": "arn:aws:states:us-east-2:520649825970:stateMachine:find-the-match-start-relations-step-functions"
+}

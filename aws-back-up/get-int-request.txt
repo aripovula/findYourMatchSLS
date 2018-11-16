@@ -3,7 +3,8 @@
 
 
 {
-    "type" : "$input.params('type')",
-    "accessToken" : "$input.params('accessToken')",
-    "candidateID" : "$input.params('candidateID')"
+    "accessToken": "$util.escapeJavaScript($input.params('accessToken'))",
+    "type": "$util.escapeJavaScript($input.params('type'))",
+    "candidateID": "$util.escapeJavaScript($input.params('candidateID'))"
+
 }
