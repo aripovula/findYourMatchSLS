@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { Ng2SmartTableModule } from 'ng2-smart-table';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -37,7 +38,8 @@ const appRoutes: Routes = [
     HttpModule,
     RouterModule.forRoot(
       appRoutes
-    )
+    ),
+    Ng2SmartTableModule
   ],
   providers: [CognitoService, DataService, AuthGuard],
   bootstrap: [AppComponent]

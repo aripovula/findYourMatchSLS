@@ -23,4 +23,5 @@
   <div *ngFor="let user of users; let ind = index;">
     Name: {{user.name}}, gender: {{user.gender}}, interests: {{user.interests}}
   </div>
+  <ng2-smart-table [settings]="settings" [source]="data"></ng2-smart-table>
 </div>

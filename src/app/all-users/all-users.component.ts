@@ -1,6 +1,7 @@
-import { Candidate } from './../models/candidate.model';
 import { Component, OnInit } from '@angular/core';
 
+
+import { Candidate } from './../models/candidate.model';
 import { DataService } from './../services/data.service';
 
 @Component({
@@ -17,6 +18,39 @@ export class AllUsersComponent implements OnInit {
   responseText3 = '';
   abc = 0;
   id = 'a14';
+
+  settings = {
+    columns: {
+      id: {
+        title: 'ID'
+      },
+      name: {
+        title: 'Full Name'
+      },
+      username: {
+        title: 'User Name'
+      },
+      email: {
+        title: 'Email'
+      }
+    }
+  };
+
+  data = [
+    {
+      id: 1,
+      name: 'Leanne Graham',
+      username: 'Bret',
+      email: 'Sincere@april.biz'
+    },
+    // ... other rows here
+    {
+      id: 11,
+      name: 'Nicholas DuBuque',
+      username: 'Nicholas.Stanton',
+      email: 'Rey.Padberg@rosamond.biz'
+    }
+  ];
 
   constructor(private dataService: DataService) { }
 
