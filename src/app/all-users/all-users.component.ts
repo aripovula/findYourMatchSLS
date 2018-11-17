@@ -36,38 +36,26 @@ export class AllUsersComponent implements OnInit {
     }
   };
 
-  data = [
-    {
-      id: 1,
-      name: 'Leanne Graham',
-      username: 'Bret',
-      email: 'Sincere@april.biz'
-    },
-    // ... other rows here
-    {
-      id: 11,
-      name: 'Nicholas DuBuque',
-      username: 'Nicholas.Stanton',
-      email: 'Rey.Padberg@rosamond.biz'
-    }
-  ];
+  data = [];
 
   constructor(private dataService: DataService) { }
 
   ngOnInit() {
+    this.onGetAllClicked();
   }
 
   onPostClicked() {
     const candidate = new Candidate(this.id, 'Ula B New 24', 'male', 'sports, arts, acting');
-    this.dataService.post(candidate);
+    this.dataService.post(candidate).then(() => {
+      this.onGetAllClicked();
+    });
   }
 
   onGetAllClicked() {
     this.dataService.get('all', '0')
-      .then((data: Candidate[]) => {
-        this.users = data;
-        console.log('data = ' + this.users);
-        // this.responseText3 = this.users[0].interests + ', ' + this.users[1].interests;
+      .then((fromDB: Candidate[]) => {
+        // this.users = fromDB;
+        this.updateTableData(fromDB);
       })
       .catch((error) => {
         console.log('error - ', error);
@@ -76,19 +64,41 @@ export class AllUsersComponent implements OnInit {
 
   onGetSingleClicked(id) {
     this.dataService.get('single', id)
-      .then((data: Candidate[]) => {
-        console.log('data = ' + data);
-        this.users = [];
-        this.users.push(data);
-
-        // this.responseText3 = data.toString();
+      .then((fromDB: Candidate[]) => {
+        this.updateTableData(fromDB);
       })
       .catch((error) => {
         console.log('error - ', error);
       });
   }
 
+  updateTableData(fromDB) {
+    this.data = [];
+    console.log('fromDB = ', fromDB);
+    if (fromDB instanceof Array) {
+      fromDB.map((DBitem) => {
+        const item = {
+          id: DBitem.id,
+          name: DBitem.name,
+          username: DBitem.name,
+          email: DBitem.name.toLowerCase().replace(/\s/g, '') + '@aripov.info'
+        };
+        this.data.push(item);
+      });
+    } else {
+      const item = {
+        id: fromDB.id,
+        name: fromDB.name,
+        username: fromDB.name,
+        email: fromDB.name.toLowerCase().replace(/\s/g, '') + '@aripov.info'
+      };
+      this.data.push(item);
+    }
+  }
+
   onDeleteClicked() {
-    this.dataService.delete(this.id);
+    this.dataService.delete(this.id).then(() => {
+      this.onGetAllClicked();
+    });
   }
 }

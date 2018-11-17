@@ -2,26 +2,19 @@
 <div style="text-align:center">
   <h3>
     All users list (admin only)
+    <span style="font-size: 12px"> - visible to all users in DEMO version</span>
   </h3>
+  <!-- image source: https://aws.amazon.com/blogs/startups/internet-of-beer-introducing-simple-beer-service/ -->
+  <img style="float: right" src="../../assets/dynamo.png" height="90px;">
   <br/>
-  <h3>
-    <button class="button button1" (click)="onPostClicked()">post</button>
-    Post result : {{responseText1}}
-  </h3>
 
-  <h3>
+    <button class="button button1" (click)="onPostClicked()">post</button>
     <button class="button button1" (click)="onDeleteClicked()">delete</button>
-    Delete result : {{responseText2}}
-  </h3>
-  
-  <h3>
       <button class="button button1" (click)="onGetAllClicked()">get all</button>
       <button class="button button1" (click)="onGetSingleClicked(id)">get single</button>
-    Get result: {{responseText3}}
-  </h3>
 
-  <div *ngFor="let user of users; let ind = index;">
+  <!-- <div *ngFor="let user of users; let ind = index;">
     Name: {{user.name}}, gender: {{user.gender}}, interests: {{user.interests}}
-  </div>
+  </div> -->
   <ng2-smart-table [settings]="settings" [source]="data"></ng2-smart-table>
 </div>

@@ -13,10 +13,11 @@ import { DataService } from './services/data.service';
 import { CognitoService } from './services/cognito.service';
 import { FindMatchFormComponent } from './find-match-form/find-match-form.component';
 import { AuthGuard } from './services/auth-guard.service';
+import { HomeComponent } from './home/home.component';
 
 const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'home', component: AppComponent, canActivate: [AuthGuard] },
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'all_users_admin_only', component: AllUsersComponent, canActivate: [AuthGuard] },
 
   { path: 'not-found', component: NotFoundComponent },
@@ -31,6 +32,7 @@ const appRoutes: Routes = [
     NotFoundComponent,
     AllUsersComponent,
     FindMatchFormComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,
