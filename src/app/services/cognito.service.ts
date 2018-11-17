@@ -83,9 +83,12 @@ export class CognitoService {
       const cognitoUser = new CognitoUser(userData);
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: function (result) {
-          console.log('Logged in ');
+          console.log('Logged in result ', result);
           that.isLoggedInSubject.next(true);
           that.isNotFirstTime = false;
+          that.cognitoUser = cognitoUser;
+          console.log('cognitoUser = ', cognitoUser);
+          that.LoggedInUsername.next(cognitoUser.getUsername());
         },
 
         onFailure: function (err) {
