@@ -17,7 +17,7 @@ export class AllUsersComponent implements OnInit {
   responseText2 = '';
   responseText3 = '';
   abc = 0;
-  id = 'a14';
+  id = 'a18';
 
   settings = {
     columns: {
@@ -37,6 +37,7 @@ export class AllUsersComponent implements OnInit {
   };
 
   data = [];
+  greetings = [];
 
   constructor(private dataService: DataService) { }
 
@@ -45,7 +46,7 @@ export class AllUsersComponent implements OnInit {
   }
 
   onPostClicked() {
-    const candidate = new Candidate(this.id, 'Ula B New 24', 'male', 'sports, arts, acting');
+    const candidate = new Candidate(this.id, 'Ann B 18', 'female', 'science, arts, acting');
     this.dataService.post(candidate).then(() => {
       this.onGetAllClicked();
     });
@@ -70,6 +71,23 @@ export class AllUsersComponent implements OnInit {
       .catch((error) => {
         console.log('error - ', error);
       });
+  }
+
+  onGetAudio1Clicked(id) {
+    this.dataService.getAudio('initial', id)
+      .then((fromDB: any) => {
+        this.greetings = fromDB.data;
+        console.log('this.greetings=', this.greetings);
+
+      })
+      .catch((error) => {
+        console.log('error - ', error);
+      })
+      ;
+  }
+
+  onPlayAudioClicked(url) {
+    new Audio(url).play();
   }
 
   updateTableData(fromDB) {

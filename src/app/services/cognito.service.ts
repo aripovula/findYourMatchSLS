@@ -10,10 +10,9 @@ import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
   providedIn: 'root'
 })
 export class CognitoService {
-  poolData = {
-    UserPoolId: 'us-east-2_XUFaLomWO',
-    ClientId: '531ogvs2lm67fnifmvmd3mjnv4'
-  };
+  poolData =
+  { UserPoolId: 'us-east-1_6wmO1o7KH', ClientId: '7jhakhv82f1t8c8svgg417n4go' };
+  // { UserPoolId: 'us-east-2_XUFaLomWO', ClientId: '531ogvs2lm67fnifmvmd3mjnv4' };
   userPool = new CognitoUserPool(this.poolData);
   isLoggedInSubject = new BehaviorSubject<boolean>(false);
   LoggedInUsername = new BehaviorSubject<string>('');

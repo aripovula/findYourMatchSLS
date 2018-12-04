@@ -8,13 +8,22 @@
   <img style="float: right" src="../../assets/dynamo.png" height="90px;">
   <br/>
 
-    <button class="button button1" (click)="onPostClicked()">post</button>
-    <button class="button button1" (click)="onDeleteClicked()">delete</button>
-      <button class="button button1" (click)="onGetAllClicked()">get all</button>
-      <button class="button button1" (click)="onGetSingleClicked(id)">get single</button>
+  <button class="button button1" (click)="onPostClicked()">post</button>
+  <button class="button button1" (click)="onDeleteClicked()">delete</button>
+  <button class="button button1" (click)="onGetAllClicked()">get all</button>
+  <button class="button button1" (click)="onGetSingleClicked(id)">get single</button>
+
+  <button class="button button1" (click)="onGetAudio1Clicked(id)">get greeting</button>
 
   <!-- <div *ngFor="let user of users; let ind = index;">
     Name: {{user.name}}, gender: {{user.gender}}, interests: {{user.interests}}
   </div> -->
   <ng2-smart-table [settings]="settings" [source]="data"></ng2-smart-table>
+
+  <div *ngFor="let greeting of greetings; let ind=index;">
+    <button class="button button1" (click)="onPlayAudioClicked(greeting.url)">play</button>
+    <span class="horIndent"></span>
+    <span>{{greeting.text}}</span>
+    <span style="font-size: 12px;">- url: {{greeting.url}}</span>
+  </div>
 </div>
