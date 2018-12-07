@@ -1,31 +1,56 @@
-<div style="text-align:center">
-  <h1>
-    Ngx-Webcam Demo
-  </h1>
+<div>
+  <div>
+    <button class="button button1" (click)="onUploadFileClicked();">Upload a file</button>
+    <button class="button button1" (click)="onWebsiteUrlClicked();">Add website image URL</button>
+    <button class="button button1" (click)="onSnapshotClicked();">Take A Snapshot</button>
+  </div>
+
 
   <div>
-    <webcam [height]="500" [width]="500" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
-      [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions" (cameraSwitched)="cameraWasSwitched($event)"
-      (initError)="handleInitError($event)"></webcam>
-    <br/>
-    <button class="actionBtn" (click)="triggerSnapshot();">Take A Snapshot</button>
-    <button class="actionBtn" (click)="toggleWebcam();">Toggle Webcam</button>
-    <br/>
-    <button class="actionBtn" (click)="showNextWebcam(true);" [disabled]="!multipleWebcamsAvailable">Next Webcam</button>
-    <input id="cameraSwitchCheckbox" type="checkbox" [(ngModel)]="allowCameraSwitch">
-    <label for="cameraSwitchCheckbox">Allow Camera Switch</label>
-    <br/> DeviceId:
-    <input id="deviceId" type="text" [(ngModel)]="deviceId" style="width: 500px">
-    <button (click)="showNextWebcam(deviceId);">Activate</button>
+    <div *ngIf="isCapturePhotoChosen">
+      <form>
+        <div id="myModal" class="modal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <span class="close" (click)="onCapturePhotoModalClose()">&times;</span>
+              <p>Capture photo mode</p>
+            </div>
+            <div class="modal-body">
+              <div style="text-align:center">
+                <div *ngIf="!isPhotoCaptured">
+
+                  <webcam [height]="400" [width]="400" [trigger]="triggerObservable" 
+                    (imageCapture)="handleImage($event)" *ngIf="showWebcam"
+                    [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable" 
+                    [videoOptions]="videoOptions"
+                    
+                    (initError)="handleInitError($event)">
+                  </webcam>
+                  <br/>
+
+                  <button class="button button1" (click)="triggerSnapshot();">Take A Snapshot</button>
+                  <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Close</button>
+                  <br/>
+                </div>
+
+                <div *ngIf="isPhotoCaptured">
+                  <div class="snapshot" *ngIf="webcamImage">
+                    <img height="400px" [src]="webcamImage.imageAsDataUrl" />
+                  </div>
+                  <br/>
+                  <button type="button" class="button button1" (click)="onImageCaptureSubmitted()">Submit</button>
+                  <button class="button button1" (click)="onCaptureAgainClicked();">Take A New Snapshot</button>
+                  <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Cancel</button>
+                  <br/>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <br/>
+          <br/>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
-
-<div class="snapshot" *ngIf="webcamImage">
-  <h2>Nice one!</h2>
-  <img [src]="webcamImage.imageAsDataUrl" />
-</div>
-
-<h4 *ngIf="errors.length > 0">Messages:</h4>
-<ul *ngFor="let error of errors">
-  <li>{{error | json}}</li>
-</ul>

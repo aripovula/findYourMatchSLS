@@ -12,9 +12,10 @@ export class DataService {
   findMatchRequest: FindMatchRequest;
   stageURL =
   // 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development';
-  'https://0feeyn3i79.execute-api.us-east-1.amazonaws.com/development';
+  'https://aqlvssolpl.execute-api.us-east-1.amazonaws.com/development';
   extn1 = '/find-your-match';
   extn2 = '/start-relations/audio';
+  extn3 = '/start-relations/imagerekog';
 
   constructor(private http: Http, private authService: CognitoService) { }
 
@@ -141,4 +142,38 @@ export class DataService {
     });
   }
 
+  postImage(image: any) {
+
+    const that = this;
+    const imageObj = { image: JSON.stringify(image) };
+    // POST
+    return new Promise((resolve, reject) => {
+      this.authService.getCurrentUser().getSession((err, session) => {
+        // console.log('ID token ', session.getIdToken().getJwtToken());
+        // console.log('ACCESS token ', session.getAccessToken().getJwtToken());
+
+        console.log('sending post');
+        that.http.post(
+          this.stageURL + this.extn3
+          + '?accessToken='
+          + session.getAccessToken().getJwtToken(),
+          imageObj,
+          {
+            headers: new Headers({
+              'Authorization': session.getIdToken().getJwtToken()
+            })
+          })
+          .subscribe(
+            (result: any) => {
+              // that.responseText1 = JSON.parse(result.json);
+              console.log('result = ', result);
+              resolve();
+            },
+            (error) => {
+              reject();
+            }
+          );
+      });
+    });
+  }
 }

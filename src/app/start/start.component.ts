@@ -1,3 +1,4 @@
+import { DataService } from './../services/data.service';
 import { Component, OnInit } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
@@ -9,7 +10,12 @@ import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
   templateUrl: './start.component.html',
   styleUrls: ['./start.component.css']
 })
+
 export class StartComponent implements OnInit {
+
+  isCapturePhotoChosen = false;
+  isPhotoCaptured = false;
+
 
   // toggle webcam on/off
   public showWebcam = true;
@@ -30,6 +36,9 @@ export class StartComponent implements OnInit {
   // switch to next / previous / specific webcam; true/false: forward/backwards, string: deviceId
   private nextWebcam: Subject<boolean | string> = new Subject<boolean | string>();
 
+
+  constructor(private dataService: DataService) { }
+
   public ngOnInit(): void {
     WebcamUtil.getAvailableVideoInputs()
       .then((mediaDevices: MediaDeviceInfo[]) => {
@@ -37,33 +46,39 @@ export class StartComponent implements OnInit {
       });
   }
 
-  public triggerSnapshot(): void {
-    this.trigger.next();
+  onSnapshotClicked() {
+    this.isCapturePhotoChosen = true;
+    this.isPhotoCaptured = false;
   }
 
-  public toggleWebcam(): void {
-    this.showWebcam = !this.showWebcam;
-  }
-
-  public handleInitError(error: WebcamInitError): void {
-    this.errors.push(error);
-  }
-
-  public showNextWebcam(directionOrDeviceId: boolean | string): void {
-    // true => move forward through devices
-    // false => move backwards through devices
-    // string => move to device with given deviceId
-    this.nextWebcam.next(directionOrDeviceId);
+  onCapturePhotoModalClose() {
+    this.isCapturePhotoChosen = false;
+    this.isPhotoCaptured = false;
   }
 
   public handleImage(webcamImage: WebcamImage): void {
     console.log('received webcam image', webcamImage);
+    this.isPhotoCaptured = true;
     this.webcamImage = webcamImage;
   }
 
-  public cameraWasSwitched(deviceId: string): void {
-    console.log('active device: ' + deviceId);
-    this.deviceId = deviceId;
+  onImageCaptureSubmitted() {
+    this.dataService.postImage(this.webcamImage);
+    this.isCapturePhotoChosen = false;
+    this.isPhotoCaptured = false;
+  }
+
+  onCaptureAgainClicked() {
+    this.isCapturePhotoChosen = true;
+    this.isPhotoCaptured = false;
+  }
+
+  public triggerSnapshot(): void {
+    this.trigger.next();
+  }
+
+  public handleInitError(error: WebcamInitError): void {
+    this.errors.push(error);
   }
 
   public get triggerObservable(): Observable<void> {
@@ -73,5 +88,22 @@ export class StartComponent implements OnInit {
   public get nextWebcamObservable(): Observable<boolean | string> {
     return this.nextWebcam.asObservable();
   }
+
+  // public toggleWebcam(): void {
+  //   this.showWebcam = !this.showWebcam;
+  // }
+
+  // public showNextWebcam(directionOrDeviceId: boolean | string): void {
+  //   // true => move forward through devices
+  //   // false => move backwards through devices
+  //   // string => move to device with given deviceId
+  //   this.nextWebcam.next(directionOrDeviceId);
+  // }
+
+  // public cameraWasSwitched(deviceId: string): void {
+  //   console.log('active device: ' + deviceId);
+  //   this.deviceId = deviceId;
+  // }
+
 
 }
