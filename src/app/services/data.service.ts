@@ -142,6 +142,38 @@ export class DataService {
     });
   }
 
+  getInfoOnURLImage(type: string, id: string, imageUrl: string) {
+    // GET
+    console.log('type', type);
+    const that = this;
+    return new Promise((resolve, reject) => {
+      this.authService.getCurrentUser().getSession((err, session) => {
+        console.log('JWT token ', session.getIdToken().getJwtToken());
+        that.http.get(
+          this.stageURL + this.extn3 + '/'
+          + type
+          + '?'
+          + 'accessToken=' + session.getAccessToken().getJwtToken() + '&'
+          + 'candidateID=' + id + '&'
+          + 'requestorID=' + id + '&'
+          + 'imageUrl=' + encodeURIComponent(imageUrl),
+          {
+            headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
+          })
+          .subscribe(
+            (result: any) => {
+              const data = JSON.parse(result._body);
+              console.log('result = ', data);
+              resolve(data);
+            },
+            (error) => {
+              reject(error);
+            }
+          );
+      });
+    });
+  }
+
   postImage(image: any) {
 
     const that = this;

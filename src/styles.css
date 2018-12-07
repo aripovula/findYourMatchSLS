@@ -182,7 +182,7 @@ body, html {
     background-color: #eee;
     border-radius: 2px;
     margin:2px;
-    margin-left: 100px;
+    margin-left: 48px;
     width: 350px;
     font-size: 14px;
 }
@@ -337,6 +337,11 @@ a.addnlightbg:active {
   font-size: 14px;
   cursor: pointer;
 }
+.noDecor:hover{
+  text-decoration: none;
+  color:  rgb(48, 190, 238)!important; 
+  cursor: pointer;
+}
 
 .comment14 {
   text-decoration: none;
@@ -350,11 +355,6 @@ a.addnlightbg:active {
   font-size: 12px;
 }
 
-.noDecor:hover{
-  text-decoration: none;
-  color:  rgb(48, 190, 238)!important; 
-  cursor: pointer;
-}
 .noDecor2 {
   text-decoration: none;
   cursor: pointer;

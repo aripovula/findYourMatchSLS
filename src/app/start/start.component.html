@@ -1,56 +1,130 @@
-<div>
-  <div>
-    <button class="button button1" (click)="onUploadFileClicked();">Upload a file</button>
-    <button class="button button1" (click)="onWebsiteUrlClicked();">Add website image URL</button>
-    <button class="button button1" (click)="onSnapshotClicked();">Take A Snapshot</button>
-  </div>
+<div style="margin-left: 40px;">
+  <div style="font-size: 14px;">
+    <p>The Lambda function I coded:</p>
+    <p>1. Checks if there is any face and if any face is detected checks if it is:</p>
+    <p> &nbsp; a) a celebrity person</p>
+    <p> &nbsp; b) describes the face</p>
+    <p> &nbsp; c) checks if the same face is detected in any of the images</p>
+    <p>2. Describes other objects detected, if any</p>
+    <div>
+      <p>Image upload options:</p>
+      Option 1. <button class="button button1" (click)="onWebsiteUrlClicked();">Add website image URL</button>
+      <br/>
+       Option 2. <button class="button button1" (click)="onSnapshotClicked();">Take a webcam photo</button>
+      <br/>
+      <div *ngIf="uploaderHidden">
+        <span class="noDecor" (click)="onImageChangeRequest()">
+          <br/>
+          <span *ngIf="imageFile.length != 0">
+            Option 3. Image from local file system received - click here to change the image
+          </span>
+          <span *ngIf="imageFile.length == 0">
+            Option 3. Add image
+          </span>
+        </span>
+        <span class="verIndent"></span>
+      </div>
+      <div *ngIf="!uploaderHidden">
+        Option 3: 
+        <image-upload class="imageUpload" buttonCaption="Upload image" dropBoxMessage="OR drop image here" 
+        [max]="1" [extensions]="['jpg','jpeg','png','gif']"
+          [maxFileSize]="1048576" (uploadFinished)="onUploadFinished($event)" 
+          (uploadStateChanged)="onUploadStateChanged($event)">
+        </image-upload>
+      </div>
 
+    </div>
 
-  <div>
-    <div *ngIf="isCapturePhotoChosen">
+    <div *ngIf="isWebsiteURLchosen">
       <form>
         <div id="myModal" class="modal">
           <div class="modal-content">
             <div class="modal-header">
-              <span class="close" (click)="onCapturePhotoModalClose()">&times;</span>
-              <p>Capture photo mode</p>
+              <span class="close" (click)="onWebsiteURLClose()">&times;</span>
+              <p>Image URL in another website</p>
             </div>
             <div class="modal-body">
-              <div style="text-align:center">
-                <div *ngIf="!isPhotoCaptured">
-
-                  <webcam [height]="400" [width]="400" [trigger]="triggerObservable" 
-                    (imageCapture)="handleImage($event)" *ngIf="showWebcam"
-                    [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable" 
-                    [videoOptions]="videoOptions"
-                    
-                    (initError)="handleInitError($event)">
-                  </webcam>
-                  <br/>
-
-                  <button class="button button1" (click)="triggerSnapshot();">Take A Snapshot</button>
-                  <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Close</button>
-                  <br/>
-                </div>
-
-                <div *ngIf="isPhotoCaptured">
-                  <div class="snapshot" *ngIf="webcamImage">
-                    <img height="400px" [src]="webcamImage.imageAsDataUrl" />
-                  </div>
-                  <br/>
-                  <button type="button" class="button button1" (click)="onImageCaptureSubmitted()">Submit</button>
-                  <button class="button button1" (click)="onCaptureAgainClicked();">Take A New Snapshot</button>
-                  <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Cancel</button>
-                  <br/>
-                </div>
+              <br/>
+              <span>Image URL: &nbsp;</span>
+              <input type="text" id="webURL" name="webURL" [(ngModel)]="webURL">
+              <!-- <span>(ngModelChange)="onWebURLChange()"</span> -->
+              <br/>
+              <br/>
+              <p style="font-size: 14px;">Please right click on an image and use 'Copy image address' and NOT 'Copy link address'</p>
+              <p style="font-size: 14px;">( image is downloaded directly by
+                <span style="color:dodgerblue">AWS Lambda</span>. Your browser sends URL only )</p>
+              <br/>
+              <button type="button" class="button button1" (click)="onWebsiteURLSubmit()">Submit</button>
+              <button type="button" class="button button1" (click)="onWebsiteURLClose()">Close</button>
+              <p style="font-size: 14px;">Image URLs only from these sites are accepted - click one of links to open in a new window</p>
+              <div style="margin-left: 40px;">
+                <a class="noDecor" href="http://www.hollywood.com/topic/celebrities" target="_blank">celebrities - http://www.hollywood.com</a>
+                <br/>
+                <a class="noDecor" href="https://www.glamour.com/entertainment" target="_blank">celebrities - https://www.glamour.com</a>
+                <br/>
+                <a class="noDecor" href="https://pixabay.com/en/photos/portrait%20face/?" target="_blank">portrait - https://pixabay.com</a>
+                <br/>
+                <a class="noDecor" href="https://www.freeimages.com/search/portrait" target="_blank">portrait - https://www.freeimages.com</a>
+                <br/>
+                <a class="noDecor" href="https://pixabay.com/en/photos/hobby/?" target="_blank">hobby - https://pixabay.com</a>
+                <br/>
+                <a class="noDecor" href="https://www.freeimages.com/search/hobby" target="_blank">hobby - https://www.freeimages.com</a>
+                <br/>
+                <a class="noDecor" href="https://pixabay.com/en/photos/sports/?" target="_blank">sports - https://pixabay.com</a>
+                <br/>
+                <a class="noDecor" href="https://www.freeimages.com/search/sports" target="_blank">sports - https://www.freeimages.com</a>
               </div>
-
+              <br/>
+              <br/>
             </div>
           </div>
-          <br/>
-          <br/>
         </div>
       </form>
+    </div>
+
+    <div>
+      <div *ngIf="isCapturePhotoChosen">
+        <form>
+          <div id="myModal" class="modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <span class="close" (click)="onCapturePhotoModalClose()">&times;</span>
+                <p>Capture photo mode</p>
+              </div>
+              <div class="modal-body">
+                <div style="text-align:center">
+                  <div *ngIf="!isPhotoCaptured">
+                    <webcam [height]="400" [width]="400" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
+                      [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions"
+                      (initError)="handleInitError($event)">
+                    </webcam>
+                    <br/>
+                    <button class="button button1" (click)="triggerSnapshot();">Take A Snapshot</button>
+                    <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Close</button>
+                    <br/>
+                    <br/>
+                    <p style="font-size: 12px;">* Not supported in Safari. Tested in Google Chrome.</p>
+                  </div>
+
+                  <div *ngIf="isPhotoCaptured">
+                    <div class="snapshot" *ngIf="webcamImage">
+                      <img height="400px" [src]="webcamImage.imageAsDataUrl" />
+                    </div>
+                    <br/>
+                    <button type="button" class="button button1" (click)="onImageCaptureSubmitted()">Submit</button>
+                    <button class="button button1" (click)="onCaptureAgainClicked();">Take A New Snapshot</button>
+                    <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Cancel</button>
+                    <br/>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <br/>
+            <br/>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>

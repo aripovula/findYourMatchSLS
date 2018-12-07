@@ -13,39 +13,40 @@ import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 
 export class StartComponent implements OnInit {
 
+  // on capture image
   isCapturePhotoChosen = false;
   isPhotoCaptured = false;
-
-
-  // toggle webcam on/off
-  public showWebcam = true;
-  public allowCameraSwitch = true;
-  public multipleWebcamsAvailable = false;
-  public deviceId: string;
-  public videoOptions: MediaTrackConstraints = {
+  isWebsiteURLchosen = false;
+  showWebcam = true;
+  allowCameraSwitch = true;
+  multipleWebcamsAvailable = false;
+  deviceId: string;
+  videoOptions: MediaTrackConstraints = {
     // width: {ideal: 1024},
     // height: {ideal: 576}
   };
-  public errors: WebcamInitError[] = [];
-
-  // latest snapshot
-  public webcamImage: WebcamImage = null;
-
-  // webcam snapshot trigger
+  errors: WebcamInitError[] = [];
+  webcamImage: WebcamImage = null;
   private trigger: Subject<void> = new Subject<void>();
-  // switch to next / previous / specific webcam; true/false: forward/backwards, string: deviceId
   private nextWebcam: Subject<boolean | string> = new Subject<boolean | string>();
 
+  // on image upload from local file
+  uploaderHidden = false;
+  imageFile;
+
+  // on add image URL
+  webURL = '';
 
   constructor(private dataService: DataService) { }
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     WebcamUtil.getAvailableVideoInputs()
       .then((mediaDevices: MediaDeviceInfo[]) => {
         this.multipleWebcamsAvailable = mediaDevices && mediaDevices.length > 1;
       });
   }
 
+  // on capture image
   onSnapshotClicked() {
     this.isCapturePhotoChosen = true;
     this.isPhotoCaptured = false;
@@ -56,7 +57,7 @@ export class StartComponent implements OnInit {
     this.isPhotoCaptured = false;
   }
 
-  public handleImage(webcamImage: WebcamImage): void {
+  handleImage(webcamImage: WebcamImage): void {
     console.log('received webcam image', webcamImage);
     this.isPhotoCaptured = true;
     this.webcamImage = webcamImage;
@@ -77,15 +78,15 @@ export class StartComponent implements OnInit {
     this.trigger.next();
   }
 
-  public handleInitError(error: WebcamInitError): void {
+  handleInitError(error: WebcamInitError): void {
     this.errors.push(error);
   }
 
-  public get triggerObservable(): Observable<void> {
+  get triggerObservable(): Observable<void> {
     return this.trigger.asObservable();
   }
 
-  public get nextWebcamObservable(): Observable<boolean | string> {
+  get nextWebcamObservable(): Observable<boolean | string> {
     return this.nextWebcam.asObservable();
   }
 
@@ -105,5 +106,29 @@ export class StartComponent implements OnInit {
   //   this.deviceId = deviceId;
   // }
 
+  // on add image URL
+  onWebsiteUrlClicked() {
+    this.isWebsiteURLchosen = true;
+  }
+
+  onWebsiteURLClose() {
+    this.isWebsiteURLchosen = false;
+  }
+
+  onWebsiteURLSubmit() {
+    console.log('webURL = ', this.webURL);
+    this.dataService.getInfoOnURLImage(null, 'A1', this.webURL);
+  }
+
+  // on image upload from local file
+  onImageChangeRequest(e) {
+    this.uploaderHidden = false;
+  }
+
+  onUploadFinished(file: any) {
+    console.log('onUploadFinished ind = ', file);
+    this.uploaderHidden = true;
+    this.imageFile = file.src;
+  }
 
 }
