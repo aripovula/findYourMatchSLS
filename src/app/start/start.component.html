@@ -1,16 +1,20 @@
 <div style="margin-left: 40px;">
   <div style="font-size: 14px;">
-    <p>The Lambda function I coded:</p>
-    <p>1. Checks if there is any face and if any face is detected checks if it is:</p>
-    <p> &nbsp; a) a celebrity person</p>
-    <p> &nbsp; b) describes the face</p>
-    <p> &nbsp; c) checks if the same face is detected in any of the images</p>
-    <p>2. Describes other objects detected, if any</p>
+    <p>The Lambda function (using AWS Rekognition) :</p>
+    <div style="margin-left: 40px;">
+      <p>1. Checks if there is any face and if any face is detected it:</p>
+      <p> &nbsp; a) checks if it is a celebrity person</p>
+      <p> &nbsp; b) describes the face</p>
+      <p> &nbsp; c) checks if the same face is detected in any of the images</p>
+      <p>2. Describes other objects detected, if any</p>
+      <p>3. Immediately discards any uploaded file as its last step</p>
+    </div>
     <div>
       <p>Image upload options:</p>
-      Option 1. <button class="button button1" (click)="onWebsiteUrlClicked();">Add website image URL</button>
-      <br/>
-       Option 2. <button class="button button1" (click)="onSnapshotClicked();">Take a webcam photo</button>
+      Option 1.
+      <button class="button button1" (click)="onWebsiteUrlClicked();">Add website image URL</button>
+      <br/> Option 2.
+      <button class="button button1" (click)="onSnapshotClicked();">Take a webcam photo</button>
       <br/>
       <div *ngIf="uploaderHidden">
         <span class="noDecor" (click)="onImageChangeRequest()">
@@ -25,11 +29,9 @@
         <span class="verIndent"></span>
       </div>
       <div *ngIf="!uploaderHidden">
-        Option 3: 
-        <image-upload class="imageUpload" buttonCaption="Upload image" dropBoxMessage="OR drop image here" 
-        [max]="1" [extensions]="['jpg','jpeg','png','gif']"
-          [maxFileSize]="1048576" (uploadFinished)="onUploadFinished($event)" 
-          (uploadStateChanged)="onUploadStateChanged($event)">
+        Option 3:
+        <image-upload class="imageUpload" buttonCaption="Upload image" dropBoxMessage="OR drop image here" [max]="1" [extensions]="['jpg','jpeg','png','gif']"
+          [maxFileSize]="1048576" (uploadFinished)="onUploadFinished($event)" (uploadStateChanged)="onUploadStateChanged($event)">
         </image-upload>
       </div>
 

@@ -64,7 +64,9 @@ export class StartComponent implements OnInit {
   }
 
   onImageCaptureSubmitted() {
-    this.dataService.postImage(this.webcamImage);
+    this.dataService.postImage(this.webcamImage).then(() => {
+      this.dataService.getInfoOnURLImage('2', '1', null);
+    });
     this.isCapturePhotoChosen = false;
     this.isPhotoCaptured = false;
   }
@@ -117,7 +119,9 @@ export class StartComponent implements OnInit {
 
   onWebsiteURLSubmit() {
     console.log('webURL = ', this.webURL);
-    this.dataService.getInfoOnURLImage(null, 'A1', this.webURL);
+    this.dataService.getInfoOnURLImage('1', 'A1', this.webURL);
+    this.webURL = '';
+    this.isWebsiteURLchosen = false;
   }
 
   // on image upload from local file
@@ -129,6 +133,9 @@ export class StartComponent implements OnInit {
     console.log('onUploadFinished ind = ', file);
     this.uploaderHidden = true;
     this.imageFile = file.src;
+    this.dataService.postImage({ _imageAsDataUrl: file.src}).then(() => {
+      this.dataService.getInfoOnURLImage('2', '1', null);
+    });
   }
 
 }
