@@ -12,7 +12,7 @@ export class DataService {
   findMatchRequest: FindMatchRequest;
   stageURL =
   // 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development';
-  'https://aqlvssolpl.execute-api.us-east-1.amazonaws.com/development';
+  'https://ymh2l49k2l.execute-api.us-east-1.amazonaws.com/development';
   extn1 = '/find-your-match';
   extn2 = '/start-relations/audio';
   extn3 = '/start-relations/imagerekog';

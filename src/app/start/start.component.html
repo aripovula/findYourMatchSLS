@@ -17,13 +17,14 @@
       <button class="button button1" (click)="onSnapshotClicked();">Take a webcam photo</button>
       <br/>
       <div *ngIf="uploaderHidden">
+        <br/>
+         Option 3.
         <span class="noDecor" (click)="onImageChangeRequest()">
-          <br/>
           <span *ngIf="imageFile.length != 0">
-            Option 3. Image from local file system received - click here to change the image
+            Image from local file system received - click here to change the image
           </span>
           <span *ngIf="imageFile.length == 0">
-            Option 3. Add image
+            Add image
           </span>
         </span>
         <span class="verIndent"></span>
@@ -128,5 +129,41 @@
         </form>
       </div>
     </div>
+
+    <div style="font-size: 16px">
+      <div *ngIf="isNotValidImage">
+        <form>
+          <div id="myModal" class="modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <span class="close" (click)="onNotValidImageClose()">&times;</span>
+                <p>Image not received</p>
+              </div>
+              <div class="modal-body">
+                <div style="text-align:left">
+                  <div *ngIf="isNotValidURLprovided">
+                    <br/>
+                    <p>Image URL is not valid !</p>
+                    <p>Please right click on an image and use 'Copy image address' and NOT 'Copy link address'</p>
+                  </div>
+                  <div *ngIf="isNotValidImageProvided">
+                    <br/>
+                    <p>Image file is not valid !</p>
+                    <p>Please make sure that uploaded file is of 'jpeg', 'png' or 'gif' types.</p>
+                  </div>
+                  <button type="button" class="button button1" (click)="onNotValidImageClose()">OK</button>
+                  <br/>
+                  <br/>
+                </div>
+
+              </div>
+            </div>
+            <br/>
+            <br/>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
 </div>

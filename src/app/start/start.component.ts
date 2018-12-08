@@ -17,6 +17,10 @@ export class StartComponent implements OnInit {
   isCapturePhotoChosen = false;
   isPhotoCaptured = false;
   isWebsiteURLchosen = false;
+  isNotValidImage = false;
+  isNotValidURLprovided = false;
+  isNotValidImageProvided = false;
+
   showWebcam = true;
   allowCameraSwitch = true;
   multipleWebcamsAvailable = false;
@@ -119,7 +123,7 @@ export class StartComponent implements OnInit {
 
   onWebsiteURLSubmit() {
     console.log('webURL = ', this.webURL);
-    this.dataService.getInfoOnURLImage('1', 'A1', this.webURL);
+    this.isURLorImageFileValid(this.webURL, 1, this);
     this.webURL = '';
     this.isWebsiteURLchosen = false;
   }
@@ -133,9 +137,35 @@ export class StartComponent implements OnInit {
     console.log('onUploadFinished ind = ', file);
     this.uploaderHidden = true;
     this.imageFile = file.src;
-    this.dataService.postImage({ _imageAsDataUrl: file.src}).then(() => {
-      this.dataService.getInfoOnURLImage('2', '1', null);
-    });
+    this.isURLorImageFileValid(file.src, 2, this);
   }
 
+  onNotValidImageClose() {
+    this.isNotValidImage = false;
+    this.isNotValidURLprovided = false;
+    this.isNotValidImageProvided = false;
+  }
+
+  isURLorImageFileValid(URLorFileSrc, type: number, that) {
+    const img = new Image();
+    img.onload = () => {
+      if (type === 1) {
+        that.dataService.getInfoOnURLImage('1', 'A1', that.URLorFileSrc);
+      } else if (type === 2) {
+        that.dataService.postImage({ _imageAsDataUrl: URLorFileSrc }).then(() => {
+          that.dataService.getInfoOnURLImage('2', '1', null);
+        });
+      }
+    };
+    img.onerror = function () {
+      if (type === 1) {
+        that.isNotValidImage = true;
+        that.isNotValidURLprovided = true;
+      } else if (type === 2) {
+        that.isNotValidImage = true;
+        that.isNotValidImageProvided = true;
+      }
+    };
+    img.src = URLorFileSrc;
+  }
 }
