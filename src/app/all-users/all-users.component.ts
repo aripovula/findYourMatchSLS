@@ -46,7 +46,7 @@ export class AllUsersComponent implements OnInit {
   }
 
   onPostClicked() {
-    const candidate = new Candidate(this.id, 'Ann B 18', 'female', 'science, arts, acting');
+    const candidate = null; // new Candidate(this.id, 'Ann B 18', 'female', 'science, arts, acting');
     this.dataService.post(candidate).then(() => {
       this.onGetAllClicked();
     });

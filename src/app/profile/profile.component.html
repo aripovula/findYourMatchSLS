@@ -1,0 +1,208 @@
+<div>
+  <!-- <form (ngSubmit)="onSubmit(f)" #f="ngForm"> -->
+  <form [formGroup]="candidateForm" (ngSubmit)="onSubmit()">
+    <div id="container" class="margintop">
+      <div id="left">
+        <div>
+          <div ng-controller="AppController" nv-file-drop="" uploader="uploader">
+
+            <div class="scrollDiv boxed">
+              <span>Help us to find your match - describe yourself:</span>
+              <span class="verIndent"></span>
+              <!-- <form (ngSubmit)="onSubmit(f)" #f="ngForm"> -->
+              <div>
+                <div class="form-element">
+                  <label>First name:</label>
+                  <input type="text" formControlName="firstName">
+                  <div class="warning margin110" *ngIf="!candidateForm.get('firstName').valid && candidateForm.get('firstName').touched">
+                    please type a valid name
+                  </div>
+                </div>
+
+                <div class="form-element">
+                  <label>Nickname:</label>
+                  <input type="text" formControlName="nickname">
+                  <div class="warning margin110" *ngIf="!candidateForm.get('nickname').valid && candidateForm.get('nickname').touched">
+                    please type a valid nickname
+                  </div>
+                </div>
+              </div>
+              <hr/>
+              <span *ngFor="let gender of genders">
+                <label>
+                  <input type="radio" name='genderSelf' value='{{gender}}' formControlName="genderSelf"> {{gender}}
+                </label>
+                <span class="horIndent"></span>
+              </span>| &nbsp;
+              <span *ngFor="let smoker of smokers">
+                <label>
+                  <input type="radio" name='isASmokerSelf' value='{{smoker}}' formControlName="isASmokerSelf"> {{smoker}}
+                </label>
+                <span class="horIndent"></span>
+              </span>
+              <hr/>
+
+              <!--<div class="" style="  display: flex!important; ">
+                <label>Please describe yourself:
+                  <br/>
+
+                  <div class="form-group">
+                    <div *ngFor="let describeme of describemes">
+                      <div class="wrap">
+                        <label>
+                          <input type="checkbox" ngModel name="aboutme" [value]="describeme"> {{describeme}}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              <hr/>
+              <label>Interests:</label>
+              <br/>
+              <div class="form-group">
+                <div *ngFor="let interest of interests">
+                  <div class="wrap">
+                    <label>
+                      <input type="checkbox" ngModel name="interests" [value]="interest"> {{interest}}
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <hr/>
+              <label>Music / song preferences:</label>
+              <div class="form-group">
+                <div *ngFor="let musicgenre of musicgenres">
+                  <div class="wrap">
+                    <label>
+                      <input type="checkbox" ngModel name="musicgenre" [value]="musicgenre"> {{musicgenre}}
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <hr/>
+              <label>Do you love / tolerate pet(s) ? </label>
+              <span *ngFor="let yesNo of yesNos">
+                <span class="horIndent"></span>
+                <label>
+                  <input type="radio" ngModel name="petdetails" [value]="yesNo"> {{yesNo}}
+                </label>
+              </span>
+              <hr/>
+
+              <label>Your hobbies:
+                <input type="text" autocomplete="off" ngModel name="othercommenttext" size="50">
+              </label>
+              <br/> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="right">
+        <div ng-controller="AppController" nv-file-drop="" uploader="uploader">
+
+          <div class="scrollDiv boxed">
+            <!--<span style="font-size: 16px;">Please describe who would be your perfect match:</span>
+            <br/>
+            <span class="verIndent"></span>
+            <span *ngFor="let gender of genders">
+              <label>
+                <input type="radio" ngModel name="gender" [value]="gender"> {{gender}}
+              </label>
+              <span class="horIndent"></span>
+            </span>
+            |&nbsp;
+            <span *ngFor="let smoker of smokers">
+              <label>
+                <input type="radio" ngModel name="smoker" [value]="smoker"> {{smoker}}
+              </label>
+              <span class="horIndent"></span>
+            </span>
+            <hr/>
+            <div>
+              <select id="describe" [ngModel]="'include'" name="describe">
+                <option value="include">Include </option>
+                <option value="exclude">Exclude </option>
+              </select>
+              &nbsp;&nbsp;those who describe them as:
+            </div>
+            <div class="form-group">
+              <div *ngFor="let describeme of describemes">
+                <div class="wrap">
+                  <label>
+                    <input type="checkbox" ngModel name="aboutme" [value]="describeme"> {{describeme}}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <hr/>
+            <div>
+              <select id="describe" [ngModel]="'include'" name="describe">
+                <option value="include">Include </option>
+                <option value="exclude">Exclude </option>
+              </select>
+              &nbsp;&nbsp;those interested in:
+            </div>
+            <div class="form-group">
+              <div *ngFor="let interest of interests">
+                <div class="wrap">
+                  <label>
+                    <input type="checkbox" ngModel name="interests" [value]="interest"> {{interest}}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <hr/>
+            <div>
+              <select id="describe" [ngModel]="'include'" name="describe">
+                <option value="include">Include </option>
+                <option value="exclude">Exclude </option>
+              </select>
+              &nbsp;&nbsp;those who prefer:
+            </div>
+
+            <div class="form-group">
+              <div *ngFor="let musicgenre of musicgenres">
+                <div class="wrap">
+                  <label>
+                    <input type="checkbox" ngModel name="musicgenre" [value]="musicgenre"> {{musicgenre}}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <hr/>
+            <label>Include those who love / tolerate pets ? </label>
+            <span *ngFor="let yesNo of yesNos">
+              <span class="horIndent"></span>
+              <label>
+                <input type="radio" ngModel name="petdetails" [value]="yesNo"> {{yesNo}}
+              </label>
+            </span>
+            <hr/>
+            <label>One looking for :</label>
+            <span *ngFor="let intention of intentions">
+              <span class="horIndent"></span>
+              <label>
+                <input type="radio" ngModel name="intention" [value]="intention"> {{intention}}
+              </label>
+            </span>
+            <hr/>
+            <br/>-->
+          </div> 
+        </div>
+
+      </div>
+    </div>
+    <!-- <span style="text-align:center"> -->
+    <span class="horIndent"></span>
+    <span>Form is partially pre-filled using random values - feel free to change. Form condensed for brevity.
+      <span class="horIndent"></span>
+      <button class="button button1" type="submit" [disabled]="!candidateForm.valid">Submit form</button>
+    </span>
+    <!-- <button class="button button1" (click)="onPostClicked()"> Submit form</button> -->
+    <!-- </span> -->
+    <br/>
+  </form>
+</div>

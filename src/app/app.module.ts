@@ -18,6 +18,7 @@ import { FindMatchFormComponent } from './find-match-form/find-match-form.compon
 import { AuthGuard } from './services/auth-guard.service';
 import { HomeComponent } from './home/home.component';
 import { StartComponent } from './start/start.component';
+import { ProfileComponent } from './profile/profile.component';
 
 const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -39,6 +40,7 @@ const appRoutes: Routes = [
     FindMatchFormComponent,
     HomeComponent,
     StartComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
