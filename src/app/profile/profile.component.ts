@@ -16,7 +16,7 @@ import { Candidate } from './../models/candidate.model';
 export class ProfileComponent {
   personalityTypes = ['extravert', 'intravert'];
   characters = ['funny', 'joyful', 'silent'];
-  behavings = ['calm', 'moderate', 'impulsive'];
+  behavings = ['calm', 'active', 'impulsive'];
   interests = ['sports', 'politics', 'science', 'music', 'arts', 'literature'];
   genders = ['male', 'female', 'other'];
   smokers = ['smoker', 'non-smoker'];

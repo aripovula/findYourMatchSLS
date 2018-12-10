@@ -70,14 +70,13 @@ export class AllUsersComponent implements OnInit {
   onGetAudio1Clicked(id) {
     this.dataService.getAudio('initial', id)
       .then((fromDB: any) => {
-        this.greetings = fromDB.data;
+        this.greetings = fromDB;
         console.log('this.greetings=', this.greetings);
 
       })
       .catch((error) => {
         console.log('error - ', error);
-      })
-      ;
+      });
   }
 
   onPlayAudioClicked(url) {
@@ -89,18 +88,21 @@ export class AllUsersComponent implements OnInit {
     console.log('fromDB = ', fromDB);
     if (fromDB instanceof Array) {
       fromDB.map((DBitem) => {
+        const otherData = JSON.parse(DBitem.otherDetails.replace(/#%#/g, '"'));
+        console.log('otherData = ', otherData);
         const item = {
-          userName: DBitem.userName,
-          otherDetails: DBitem.otherDetails.replace(/#%#/g, '-'),
-          email: DBitem.userName.toLowerCase().replace(/\s/g, '') + '@aripov.info'
+          userName: otherData.firstName,
+          otherDetails: otherData.personalityTypeSelf + ', ' + otherData.characterSelf + ', ' + otherData.behavingSelf,
+          email: otherData.firstName.toLowerCase().replace(/\s/g, '') + '@soulmates.cafe'
         };
         this.data.push(item);
       });
     } else {
+      const otherData = JSON.parse(fromDB.otherDetails.replace(/#%#/g, '"'));
       const item = {
-        userName: fromDB.userName,
-        otherDetails: fromDB.otherDetails.replace(/#%#/g, '-'),
-        email: fromDB.userName.toLowerCase().replace(/\s/g, '') + '@aripov.info'
+        userName: otherData.firstName,
+        otherDetails: otherData.personalityTypeSelf + ', ' + otherData.characterSelf + ', ' + otherData.behavingSelf,
+        email: otherData.firstName.toLowerCase().replace(/\s/g, '') + '@soulmates.cafe'
       };
       this.data.push(item);
     }

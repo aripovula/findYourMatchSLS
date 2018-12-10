@@ -13,6 +13,7 @@ import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 
 export class StartComponent implements OnInit {
 
+  greetings = [];
   // on capture image
   isCapturePhotoChosen = false;
   isPhotoCaptured = false;
@@ -41,7 +42,7 @@ export class StartComponent implements OnInit {
   // on add image URL
   webURL = '';
 
-  constructor(private dataService: DataService) { }
+  constructor(private dataService: DataService) { this.onGetAudio1Clicked('a'); }
 
   ngOnInit(): void {
     WebcamUtil.getAvailableVideoInputs()
@@ -168,4 +169,22 @@ export class StartComponent implements OnInit {
     };
     img.src = URLorFileSrc;
   }
+
+  onGetAudio1Clicked(id) {
+    this.dataService.getAudio('initial', id)
+      .then((fromDB: any) => {
+        this.greetings = fromDB;
+        console.log('this.greetings=', this.greetings);
+
+      })
+      .catch((error) => {
+        console.log('error - ', error);
+      })
+      ;
+  }
+
+  onPlayAudioClicked(url) {
+    new Audio(url).play();
+  }
+
 }

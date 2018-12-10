@@ -128,7 +128,7 @@ export class DataService {
           + 'requestorID=' + id,
           {
             headers: new Headers(
-              // { 'Authorization': session.getIdToken().getJwtToken() }
+              { 'Authorization': session.getIdToken().getJwtToken() }
             )
           })
           .subscribe(
