@@ -5,12 +5,13 @@
         <div>
           <div ng-controller="AppController" nv-file-drop="" uploader="uploader">
             <div class="scrollDiv boxed">
-              <span>Describe yourself - partially pre-filled - feel free to change:</span>
+              <span>Describe yourself - random pre-filled - feel free to change:</span>
               <span class="verIndent"></span>
               <div>
                 <div class="form-element">
                   <label>First name:</label>
                   <input type="text" formControlName="firstName">
+                  <a (click)="assignValues()" class="noDecor"> &nbsp;( ramdom change )</a>
                   <div class="warning margin110" *ngIf="!candidateForm.get('firstName').valid && candidateForm.get('firstName').touched">
                     please type a valid name (min. 3 chareacters)
                   </div>
@@ -38,20 +39,33 @@
               </span>
               <hr/>
 
-              <div class="" style="display: flex!important; ">
-                <label>Please describe yourself:
-                  <br/>
-                  <div class="form-group">
-                    <div *ngFor="let control of candidateForm.controls['descriptionSelf'].controls; let ind=index;">
-                      <div class="wrap">
-                        <label>
-                          <input type="checkbox" id="checkbox-1" value="value-1" 
-                           (ngModelChange)="validateCBs()" [formControl]="control" /> {{describemes[ind]}}
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </label>
+              <div>
+                <label>Please describe yourself:</label>
+                <br/>
+                <span class="verIndent"></span>
+                <span *ngFor="let personalityType of personalityTypes">
+                  <label>
+                    <input type="radio" name='personalityTypeSelf' value='{{personalityType}}' formControlName="personalityTypeSelf"> {{personalityType}}
+                  </label>
+                  <span class="horIndent"></span>
+                </span>
+                <br/>
+                <span class="verIndent"></span>
+                <span *ngFor="let character of characters">
+                  <label>
+                    <input type="radio" name='characterSelf' value='{{character}}' formControlName="characterSelf"> {{character}}
+                  </label>
+                  <span class="horIndent"></span>
+                </span>
+                <br/>
+                <span class="verIndent"></span>
+                <span *ngFor="let behaving of behavings">
+                  <label>
+                    <input type="radio" name='behavingSelf' value='{{behaving}}' formControlName="behavingSelf"> {{behaving}}
+                  </label>
+                  <span class="horIndent"></span>
+                </span>
+
               </div>
               <hr/>
               <label>Interests:</label>
@@ -60,7 +74,7 @@
                 <div *ngFor="let control of candidateForm.controls['interestsSelf'].controls; let ind=index;">
                   <div class="wrap">
                     <label>
-                      <input type="checkbox" id="checkbox-1" value="value-1" [formControl]="control" (ngModelChange)="validateCBs()"/> {{interests[ind]}}
+                      <input type="checkbox" id="checkbox-1" value="value-1" [formControl]="control" (ngModelChange)="validateCBs()" /> {{interests[ind]}}
                     </label>
                   </div>
                 </div>
@@ -71,7 +85,7 @@
                 <div *ngFor="let control of candidateForm.controls['songGenreSelf'].controls; let ind=index;">
                   <div class="wrap">
                     <label>
-                      <input type="checkbox" id="checkbox-1" value="value-1" [formControl]="control" (ngModelChange)="validateCBs()"/> {{musicgenres[ind]}}
+                      <input type="checkbox" id="checkbox-1" value="value-1" [formControl]="control" (ngModelChange)="validateCBs()" /> {{musicgenres[ind]}}
                     </label>
                   </div>
                 </div>
@@ -95,7 +109,7 @@
         </div>
       </div>
       <div id="right">
-        <div ng-controller="AppController" nv-file-drop="" uploader="uploader">
+        <div>
 
           <div class="scrollDiv boxed">
             <span style="font-size: 16px;">Please describe who would be your perfect match:</span>
@@ -128,15 +142,30 @@
               <span style="color: gray; font-size: 14px;">( desription, interests and song preferences were set as yours )</span>
             </div>
             <div *ngIf="!hideFindForm">
-              <div class="form-group">
-                <div *ngFor="let control of candidateForm.controls['descriptionFind'].controls; let ind=index;">
-                  <div class="wrap">
-                    <label>
-                      <input type="checkbox" id="checkbox-1" value="value-1" [formControl]="control" (ngModelChange)="validateCBs()"/> {{describemes[ind]}}
-                    </label>
-                  </div>
-                </div>
-              </div>
+              <div>
+                <span class="verIndent"></span>
+                <span *ngFor="let personalityType of personalityTypes">
+                  <label>
+                    <input type="radio" name='personalityTypeFind' value='{{personalityType}}' formControlName="personalityTypeFind"> {{personalityType}}
+                  </label>
+                  <span class="horIndent"></span>
+                </span>
+                <br/>
+                <span class="verIndent"></span>
+                <span *ngFor="let character of characters">
+                  <label>
+                    <input type="radio" name='characterFind' value='{{character}}' formControlName="characterFind"> {{character}}
+                  </label>
+                  <span class="horIndent"></span>
+                </span>
+                <br/>
+                <span class="verIndent"></span>
+                <span *ngFor="let behaving of behavings">
+                  <label>
+                    <input type="radio" name='behavingFind' value='{{behaving}}' formControlName="behavingFind"> {{behaving}}
+                  </label>
+                  <span class="horIndent"></span>
+                </span>              </div>
               <hr/>
               <div class="form-group">
                 <div *ngFor="let control of candidateForm.controls['interestsFind'].controls; let ind=index;">
@@ -174,18 +203,17 @@
                 <input type="radio" name='intentions' value='{{intention}}' formControlName="intentions"> {{intention}}
               </label>
             </span>
-            <hr/>
-            <br/>
           </div>
-        </div>
+          <br/>
+          <span class="horIndent"></span>
+          <span>Form is condensed for brevity.
+            <span class="horIndent"></span>
+            <button class="button button1" type="submit" [disabled]="!candidateForm.valid || !areChecklistsValid">Submit form</button>
+          </span>
 
+        </div>
       </div>
     </div>
-    <span class="horIndent"></span>
-    <span>Form is condensed for brevity.
-      <span class="horIndent"></span>
-      <button class="button button1" type="submit" [disabled]="!candidateForm.valid || !areChecklistsValid">Submit form</button>
-    </span>
     <br/>
   </form>
 </div>

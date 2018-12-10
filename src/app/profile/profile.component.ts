@@ -1,11 +1,12 @@
-import { Component} from '@angular/core';
+import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { UUID } from 'angular2-uuid';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 
+import { CognitoService } from './../services/cognito.service';
 import { DataService } from './../services/data.service';
 import { Candidate } from './../models/candidate.model';
-import { CandidateDetailed } from '../models/candidate_detailed.model';
+
 
 @Component({
   selector: 'app-profile',
@@ -13,8 +14,9 @@ import { CandidateDetailed } from '../models/candidate_detailed.model';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent {
-
-  describemes = ['extravert', 'intravert', 'joyful', 'silent', 'calm', 'impulsive'];
+  personalityTypes = ['extravert', 'intravert'];
+  characters = ['funny', 'joyful', 'silent'];
+  behavings = ['calm', 'moderate', 'impulsive'];
   interests = ['sports', 'politics', 'science', 'music', 'arts', 'literature'];
   genders = ['male', 'female', 'other'];
   smokers = ['smoker', 'non-smoker'];
@@ -23,46 +25,83 @@ export class ProfileComponent {
   lovePets = ['yes', 'no', 'depends'];
   intentions = ['long-term relations', 'flirting', 'friendship'];
   sameAsMines = ['same characteristics as mine', 'different'];
+  names = [{ name: 'Alexander', nname: 'Alex' }, { name: 'Benjamin', nname: 'Ben' },
+    { name: 'Samuel', nname: 'Sam' }, { name: 'Thomas', nname: 'Tom' },
+    { name: 'Matthew', nname: 'Matt' }, { name: 'Steven', nname: 'Steve' }];
+  hobbies = ['painting', 'wood craft', 'baking', 'cooking', 'fishing', 'robotics', 'art design', 'biking'];
+  myHobbies;
+
   hideFindForm = false;
   areChecklistsValid = true;
 
-  // initial values of checkboxes
-  descriptionSelf_Array = new FormArray([new FormControl(true), new FormControl(false), new FormControl(false),
-  new FormControl(false), new FormControl(true), new FormControl(false)]);
-  interestsSelf_Array = new FormArray([new FormControl(true), new FormControl(false), new FormControl(true),
-  new FormControl(false), new FormControl(true), new FormControl(false)]);
-  songGenreSelf_Array = new FormArray([new FormControl(false), new FormControl(true), new FormControl(true),
-  new FormControl(true), new FormControl(false), new FormControl(false)]);
+  candidateForm;
+  a = this.assignValues();
 
-  descriptionFind_Array = new FormArray([new FormControl(true), new FormControl(false), new FormControl(false),
-  new FormControl(false), new FormControl(true), new FormControl(false)]);
-  interestsFind_Array = new FormArray([new FormControl(true), new FormControl(false), new FormControl(false),
-  new FormControl(false), new FormControl(true), new FormControl(false)]);
-  songGenreFind_Array = new FormArray([new FormControl(false), new FormControl(true), new FormControl(true),
-  new FormControl(true), new FormControl(false), new FormControl(false)]);
+  constructor(private dataService: DataService, private cognitoService: CognitoService) { }
 
+  assignRandom(array) {
+    return array[this.getRandom(0, array.length - 1)];
+  }
 
-  candidateForm = new FormGroup({
-    firstName: new FormControl('Alexander', [Validators.required, Validators.minLength(3)]),
-    nickname: new FormControl('Alex', [Validators.required, Validators.minLength(2)]),
-    genderSelf: new FormControl('male'),
-    isASmokerSelf: new FormControl('non-smoker'),
-    descriptionSelf: this.descriptionSelf_Array,
-    interestsSelf: this.interestsSelf_Array,
-    songGenreSelf: this.songGenreSelf_Array,
-    lovePetsSelf: new FormControl('depends'),
-    hobbiesSelf: new FormControl('abc'),
-    genderFind: new FormControl('female'),
-    isASmokerFind: new FormControl('non-smoker'),
-    descriptionFind: this.descriptionFind_Array,
-    interestsFind: this.interestsFind_Array,
-    songGenreFind: this.songGenreFind_Array,
-    lovePetsFind: new FormControl('depends'),
-    intentions: new FormControl('long-term relations'),
-    sameAsMineFind: new FormControl('different')
-  });
+  getRandom(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+  }
 
-  constructor(private dataService: DataService) {}
+  randBool() {
+    return Math.random() >= 0.5;
+  }
+
+  assignValues() {
+    // initial values of checkboxes
+    const interestsSelf_Array = new FormArray([new FormControl(this.randBool()), new FormControl(this.randBool()),
+    new FormControl(this.randBool()), new FormControl(this.randBool()), new FormControl(this.randBool()),
+    new FormControl(this.randBool())]);
+
+    const songGenreSelf_Array = new FormArray([new FormControl(this.randBool()), new FormControl(this.randBool()),
+    new FormControl(this.randBool()), new FormControl(this.randBool()), new FormControl(this.randBool()),
+    new FormControl(this.randBool())]);
+
+    const interestsFind_Array = new FormArray([new FormControl(this.randBool()), new FormControl(this.randBool()),
+    new FormControl(this.randBool()), new FormControl(this.randBool()), new FormControl(this.randBool()),
+    new FormControl(this.randBool())]);
+    const songGenreFind_Array = new FormArray([new FormControl(this.randBool()), new FormControl(this.randBool()),
+    new FormControl(this.randBool()), new FormControl(this.randBool()), new FormControl(this.randBool()),
+    new FormControl(this.randBool())]);
+
+    const smokePref = this.assignRandom(this.smokers);
+    const petPref = this.assignRandom(this.lovePets);
+    const genderSf = this.cognitoService.cognitoUser.getUsername() === 'Ann' ? 'female' : 'male';
+    const genderFd = this.cognitoService.cognitoUser.getUsername() === 'Ann' ? 'male' : 'female';
+    const name = this.assignRandom(this.names);
+    this.myHobbies = '';
+    this.hobbies.forEach(element => {
+      if (this.randBool()) { this.myHobbies = this.myHobbies + element + '; '; }
+    });
+
+    this.candidateForm = new FormGroup({
+      firstName: new FormControl(name.name, [Validators.required, Validators.minLength(3)]),
+      nickname: new FormControl(name.nname, [Validators.required, Validators.minLength(2)]),
+      genderSelf: new FormControl(genderSf),
+      isASmokerSelf: new FormControl(smokePref),
+      personalityTypeSelf: new FormControl(this.assignRandom(this.personalityTypes)),
+      characterSelf: new FormControl(this.assignRandom(this.characters)),
+      behavingSelf: new FormControl(this.assignRandom(this.behavings)),
+      interestsSelf: interestsSelf_Array,
+      songGenreSelf: songGenreSelf_Array,
+      lovePetsSelf: new FormControl(petPref),
+      hobbiesSelf: new FormControl(this.myHobbies),
+      genderFind: new FormControl(genderFd),
+      isASmokerFind: new FormControl(smokePref),
+      personalityTypeFind: new FormControl(this.assignRandom(this.personalityTypes)),
+      characterFind: new FormControl(this.assignRandom(this.characters)),
+      behavingFind: new FormControl(this.assignRandom(this.behavings)),
+      interestsFind: interestsFind_Array,
+      songGenreFind: songGenreFind_Array,
+      lovePetsFind: new FormControl(petPref),
+      intentions: new FormControl('long-term relations'),
+      sameAsMineFind: new FormControl('different')
+    });
+  }
 
   onSameAsMineChange() {
     if (this.candidateForm.value.sameAsMineFind === 'different') {
@@ -76,7 +115,6 @@ export class ProfileComponent {
   validateCBs() {
     this.areChecklistsValid = true;
     if (
-      !this.candidateForm.value.descriptionSelf.toString().includes('true') ||
       !this.candidateForm.value.interestsSelf.toString().includes('true') ||
       !this.candidateForm.value.songGenreSelf.toString().includes('true')
     ) {
@@ -84,7 +122,6 @@ export class ProfileComponent {
     }
     if (this.hideFindForm === false) {
       if (
-        !this.candidateForm.value.descriptionFind.toString().includes('true') ||
         !this.candidateForm.value.interestsFind.toString().includes('true') ||
         !this.candidateForm.value.songGenreFind.toString().includes('true')
       ) {
@@ -96,17 +133,21 @@ export class ProfileComponent {
 
   onSubmit() {
     const id = UUID.UUID();
-    const firstName = this.candidateForm.value.firstName;
-    const otherDetails = {
+    const userName = this.cognitoService.cognitoUser.getUsername();
+    const otherDetailsObj = {
       id,
-      firstName,
+      firstName: this.candidateForm.value.firstName,
       nickname: this.candidateForm.value.nickname,
       genderSelf: this.candidateForm.value.genderSelf,
       genderFind: this.candidateForm.value.genderFind,
       isASmokerSelf: this.candidateForm.value.isASmokerSelf,
       isASmokerFind: this.candidateForm.value.isASmokerFind,
-      descriptionSelf: this.candidateForm.value.descriptionSelf.toString(),
-      descriptionFind: this.candidateForm.value.descriptionFind.toString(),
+      personalityTypeSelf: this.candidateForm.value.personalityTypeSelf,
+      personalityTypeFind: this.candidateForm.value.personalityTypeFind,
+      characterSelf: this.candidateForm.value.characterSelf,
+      characterFind: this.candidateForm.value.characterFind,
+      behavingSelf: this.candidateForm.value.behavingSelf,
+      behavingFind: this.candidateForm.value.behavingFind,
       interestsSelf: this.candidateForm.value.interestsSelf.toString(),
       interestsFind: this.candidateForm.value.interestsFind.toString(),
       songGenreSelf: this.candidateForm.value.songGenreSelf.toString(),
@@ -117,7 +158,11 @@ export class ProfileComponent {
       intentions: this.candidateForm.value.intentions
     };
 
-    this.dataService.post(new Candidate(id, firstName, 'abc'));
+    let otherDetails = JSON.stringify(otherDetailsObj);
+    otherDetails = otherDetails.replace(/"/g, '#%#');
+    console.log('userName = ', userName);
+    console.log('otherDetails = ', otherDetails);
+    this.dataService.post(new Candidate(id, userName, otherDetails));
   }
 
 }

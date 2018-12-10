@@ -1,8 +1,0 @@
-{
-    "candidate": {
-        "id": "a22",
-        "name": "ULA",
-        "gender": "m",
-        "interests": "ABC"
-    }
-}

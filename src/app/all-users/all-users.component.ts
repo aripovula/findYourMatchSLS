@@ -13,22 +13,16 @@ import { DataService } from './../services/data.service';
 export class AllUsersComponent implements OnInit {
 
   users = [];
-  responseText1 = '';
-  responseText2 = '';
-  responseText3 = '';
   abc = 0;
   id = 'a18';
 
   settings = {
     columns: {
-      id: {
-        title: 'ID'
+      userName: {
+        title: 'User name'
       },
-      name: {
-        title: 'Full Name'
-      },
-      username: {
-        title: 'User Name'
+      otherDetails: {
+        title: 'Other details'
       },
       email: {
         title: 'Email'
@@ -96,19 +90,17 @@ export class AllUsersComponent implements OnInit {
     if (fromDB instanceof Array) {
       fromDB.map((DBitem) => {
         const item = {
-          id: DBitem.id,
-          name: DBitem.name,
-          username: DBitem.name,
-          email: DBitem.name.toLowerCase().replace(/\s/g, '') + '@aripov.info'
+          userName: DBitem.userName,
+          otherDetails: DBitem.otherDetails.replace(/#%#/g, '-'),
+          email: DBitem.userName.toLowerCase().replace(/\s/g, '') + '@aripov.info'
         };
         this.data.push(item);
       });
     } else {
       const item = {
-        id: fromDB.id,
-        name: fromDB.name,
-        username: fromDB.name,
-        email: fromDB.name.toLowerCase().replace(/\s/g, '') + '@aripov.info'
+        userName: fromDB.userName,
+        otherDetails: fromDB.otherDetails.replace(/#%#/g, '-'),
+        email: fromDB.userName.toLowerCase().replace(/\s/g, '') + '@aripov.info'
       };
       this.data.push(item);
     }

@@ -1,3 +1,0 @@
-{
-"you got response" : $input.json('$')
-}
