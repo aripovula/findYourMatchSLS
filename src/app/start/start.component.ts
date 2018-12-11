@@ -151,7 +151,7 @@ export class StartComponent implements OnInit {
     const img = new Image();
     img.onload = () => {
       if (type === 1) {
-        that.dataService.getInfoOnURLImage('1', 'A1', that.URLorFileSrc);
+        that.dataService.getInfoOnURLImage('1', 'A1', URLorFileSrc);
       } else if (type === 2) {
         that.dataService.postImage({ _imageAsDataUrl: URLorFileSrc }).then(() => {
           that.dataService.getInfoOnURLImage('2', '1', null);

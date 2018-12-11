@@ -165,7 +165,8 @@
                     <input type="radio" name='behavingFind' value='{{behaving}}' formControlName="behavingFind"> {{behaving}}
                   </label>
                   <span class="horIndent"></span>
-                </span>              </div>
+                </span>
+              </div>
               <hr/>
               <div class="form-group">
                 <div *ngFor="let control of candidateForm.controls['interestsFind'].controls; let ind=index;">
@@ -204,13 +205,11 @@
               </label>
             </span>
           </div>
-          <br/>
           <span class="horIndent"></span>
-          <span>Form is condensed for brevity.
-            <span class="horIndent"></span>
-            <button class="button button1" type="submit" [disabled]="!candidateForm.valid || !areChecklistsValid">Submit form</button>
-          </span>
-
+          <button class="button button1" type="submit" [disabled]="!candidateForm.valid || !areChecklistsValid">Submit form</button>
+          <div style="font-size: 12px; margin-left: 20px;">
+            <span>* For simplicity matching is done using radio button variables only. Random deviation is used to simulate match for all other criteria. Data submitted in this form is NOT stored anywhere. Only pseudo-user info is used and offered as a possible match.</span>
+          </div>
         </div>
       </div>
     </div>

@@ -14,9 +14,9 @@ import { Candidate } from './../models/candidate.model';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent {
-  personalityTypes = ['extravert', 'intravert'];
-  characters = ['funny', 'joyful', 'silent'];
-  behavings = ['calm', 'active', 'impulsive'];
+  personalityTypes = ['rather sociable (extrovert)', 'rather on my own (introvert)'];
+  characters = ['rather active (outdoor, sports)', 'rather lazy'];
+  behavings = ['calm', 'impulsive'];
   interests = ['sports', 'politics', 'science', 'music', 'arts', 'literature'];
   genders = ['male', 'female', 'other'];
   smokers = ['smoker', 'non-smoker'];
@@ -25,9 +25,13 @@ export class ProfileComponent {
   lovePets = ['yes', 'no', 'depends'];
   intentions = ['long-term relations', 'flirting', 'friendship'];
   sameAsMines = ['same characteristics as mine', 'different'];
-  names = [{ name: 'Alexander', nname: 'Alex' }, { name: 'Benjamin', nname: 'Ben' },
+  namesM = [{ name: 'Alexander', nname: 'Alex' }, { name: 'Benjamin', nname: 'Ben' },
     { name: 'Samuel', nname: 'Sam' }, { name: 'Thomas', nname: 'Tom' },
     { name: 'Matthew', nname: 'Matt' }, { name: 'Steven', nname: 'Steve' }];
+  namesF = [{ name: 'JENNIFER', nname: 'Jenni' }, { name: 'SUSAN', nname: 'Suzi' },
+    { name: 'DEBORAH', nname: 'Debra' }, { name: 'JESSICA', nname: 'Jessi' },
+    { name: 'MELISSA', nname: 'Lisa' }, { name: 'PAMELA', nname: 'Pam' }];
+
   hobbies = ['painting', 'wood craft', 'baking', 'cooking', 'fishing', 'robotics', 'art design', 'biking'];
   myHobbies;
 
@@ -72,7 +76,8 @@ export class ProfileComponent {
     const petPref = this.assignRandom(this.lovePets);
     const genderSf = this.cognitoService.cognitoUser.getUsername() === 'Ann' ? 'female' : 'male';
     const genderFd = this.cognitoService.cognitoUser.getUsername() === 'Ann' ? 'male' : 'female';
-    const name = this.assignRandom(this.names);
+    const names = this.cognitoService.cognitoUser.getUsername() === 'Ann' ? this.namesF : this.namesM;
+    const name = this.assignRandom(names);
     this.myHobbies = '';
     this.hobbies.forEach(element => {
       if (this.randBool()) { this.myHobbies = this.myHobbies + element + '; '; }

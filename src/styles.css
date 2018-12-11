@@ -264,15 +264,16 @@ previewPanel {
 }
 
 .buttonMessage {
-  background-color: rgb(228, 220, 220);
+  background-color: rgb(231, 234, 237);
   color: red;
   padding: 8px;
   border-radius: 10px;
   border-color: white;
+  /* box-shadow: 8px 0px 0px 10px rgba(0, 0, 0, 0.2), 0 8px 10px 0 rgba(0, 0, 0, 0.19); */
 }
 
 .buttonMessage:hover {
-  box-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.2), 0 8px 20px 0 rgba(0, 0, 0, 0.19);
+  background-color:lightgray;
 }
 
 .header {
