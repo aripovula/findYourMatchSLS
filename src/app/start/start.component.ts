@@ -38,6 +38,7 @@ export class StartComponent implements OnInit {
   // on image upload from local file
   uploaderHidden = false;
   imageFile;
+  imageDescription;
 
   // on add image URL
   webURL = '';
@@ -151,7 +152,8 @@ export class StartComponent implements OnInit {
     const img = new Image();
     img.onload = () => {
       if (type === 1) {
-        that.dataService.getInfoOnURLImage('1', 'A1', URLorFileSrc);
+        that.dataService.getInfoOnURLImage('1', 'A1', URLorFileSrc)
+        .then((data) => { JSON.stringify(this.imageDescription = data); });
       } else if (type === 2) {
         that.dataService.postImage({ _imageAsDataUrl: URLorFileSrc }).then(() => {
           that.dataService.getInfoOnURLImage('2', '1', null);
@@ -187,4 +189,7 @@ export class StartComponent implements OnInit {
     new Audio(url).play();
   }
 
+  onNewMessage() {
+    new Audio('../../assets/stairs.mp3').play();
+  }
 }

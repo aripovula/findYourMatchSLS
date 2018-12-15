@@ -12,7 +12,7 @@ export class DataService {
   findMatchRequest: FindMatchRequest;
   stageURL =
   // 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development';
-  'https://62zvlk9vrc.execute-api.us-east-1.amazonaws.com/development';
+  'https://lmpyzv9fz8.execute-api.us-east-1.amazonaws.com/development';
   extn1 = '/find-your-match';
   extn2 = '/start-relations/audio';
   extn3 = '/start-relations/imagerekog';
@@ -84,6 +84,7 @@ export class DataService {
 
   get(type: string, id: string) {
     // GET
+    id = 'd538e603-bdc8-9acd-e01a-fc7ad32875f2';
     console.log('type', type);
     const that = this;
     return new Promise((resolve, reject) => {

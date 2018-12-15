@@ -37,7 +37,7 @@ export class ProfileComponent {
 
   hideFindForm = false;
   areChecklistsValid = true;
-
+  fymRequestID;
   candidateForm;
   a = this.assignValues();
 
@@ -56,6 +56,7 @@ export class ProfileComponent {
   }
 
   assignValues() {
+    this.fymRequestID = UUID.UUID();
     // initial values of checkboxes
     const interestsSelf_Array = new FormArray([new FormControl(this.randBool()), new FormControl(this.randBool()),
     new FormControl(this.randBool()), new FormControl(this.randBool()), new FormControl(this.randBool()),
@@ -137,7 +138,7 @@ export class ProfileComponent {
   }
 
   onSubmit() {
-    const id = UUID.UUID();
+    const id = this.fymRequestID;
     const userName = this.cognitoService.cognitoUser.getUsername();
     const otherDetailsObj = {
       id,
