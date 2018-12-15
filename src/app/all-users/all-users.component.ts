@@ -58,7 +58,7 @@ export class AllUsersComponent implements OnInit {
   }
 
   onGetAllClicked() {
-    this.dataService.get('all', '0')
+    this.dataService.get('all', '0', null)
       .then((fromDB: Candidate[]) => {
         // this.users = fromDB;
         this.updateTableData(fromDB);
@@ -68,15 +68,15 @@ export class AllUsersComponent implements OnInit {
       });
   }
 
-  onGetSingleClicked(id) {
-    this.dataService.get('single', id)
-      .then((fromDB: Candidate[]) => {
-        this.updateTableData(fromDB);
-      })
-      .catch((error) => {
-        console.log('error - ', error);
-      });
-  }
+  // onGetSingleClicked(id) {
+  //   this.dataService.get('single', id)
+  //     .then((fromDB: Candidate[]) => {
+  //       this.updateTableData(fromDB);
+  //     })
+  //     .catch((error) => {
+  //       console.log('error - ', error);
+  //     });
+  // }
 
   onGetAudio1Clicked(id) {
     this.dataService.getAudio('initial', id)

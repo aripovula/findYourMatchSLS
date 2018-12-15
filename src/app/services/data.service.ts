@@ -9,6 +9,7 @@ import { Http, Headers, Response } from '@angular/http';
 })
 export class DataService {
 
+  fymRequestID;
   findMatchRequest: FindMatchRequest;
   stageURL =
   // 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development';
@@ -82,9 +83,9 @@ export class DataService {
     });
   }
 
-  get(type: string, id: string) {
+  get(type: string, id: string, criteriaSet: string) {
     // GET
-    id = 'd538e603-bdc8-9acd-e01a-fc7ad32875f2';
+    this.fymRequestID = id;
     console.log('type', type);
     const that = this;
     return new Promise((resolve, reject) => {
@@ -95,6 +96,7 @@ export class DataService {
           + type
           + '?'
           + 'accessToken=' + session.getAccessToken().getJwtToken() + '&'
+          + 'criteriaSet=' + criteriaSet + '&'
           + 'candidateID=' + id,
           {
             headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
@@ -116,6 +118,7 @@ export class DataService {
   getAudio(type: string, id: string) {
     // GET
     console.log('type', type);
+    id = this.fymRequestID + '-1ULA';
     const that = this;
     return new Promise((resolve, reject) => {
       this.authService.getCurrentUser().getSession((err, session) => {
@@ -161,7 +164,7 @@ export class DataService {
           + '?'
           + 'accessToken=' + session.getAccessToken().getJwtToken() + '&'
           + 'candidateID=' + id + '&'
-          + 'requestorID=' + id + '&'
+          // + 'requestorID=' + id + '&'
           + 'type=' + type + '&'
           + 'imageUrl=' + encodeURIComponent(imageUrl),
           {

@@ -164,11 +164,16 @@ export class ProfileComponent {
       intentions: this.candidateForm.value.intentions
     };
 
-    let otherDetails = JSON.stringify(otherDetailsObj);
-    otherDetails = otherDetails.replace(/"/g, '#%#');
-    console.log('userName = ', userName);
-    console.log('otherDetails = ', otherDetails);
-    this.dataService.post(new Candidate(id, userName, otherDetails));
+    let criteriaSet = JSON.stringify(otherDetailsObj);
+    criteriaSet = encodeURIComponent(criteriaSet);
+    // criteriaSet.replace(/"/g, '-%-');
+    // console.log('userName = ', userName);
+    // console.log('otherDetails = ', otherDetails);
+    // this.dataService.post(new Candidate(id, userName, otherDetails));
+    this.dataService.get('single', this.fymRequestID, criteriaSet)
+    .then((data) => {
+      console.log('data =', data);
+    });
   }
 
 }

@@ -175,7 +175,7 @@ export class StartComponent implements OnInit {
   onGetAudio1Clicked(id) {
     this.dataService.getAudio('initial', id)
       .then((fromDB: any) => {
-        this.greetings = fromDB;
+        this.greetings.push(fromDB);
         console.log('this.greetings=', this.greetings);
 
       })
