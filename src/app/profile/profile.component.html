@@ -225,19 +225,37 @@
           <div class="modal-content">
             <div class="modal-header">
               <span class="close" (click)="onConfirmModalClose()">&times;</span>
-              <p>Match found</p>
+              <p>It is a Match !</p>
             </div>
             <div class="modal-body">
-              <div style="text-align:center">
-                  <div class="snapshot" *ngIf="webcamImage">
-                    <img height="400px" [src]="webcamImage.imageAsDataUrl" />
-                  </div>
-                  <br/>
-                  <button type="button" class="button button1" (click)="onMatchConfirm()">Confirm</button>
-                  <button type="button" class="button button1" (click)="onConfirmModalClose()">Try again !</button>
-                  <br/>
-              </div>
 
+              <div id="container">
+                <div id="left">
+                  <div style="text-align:center">
+                    <div [ngStyle]="{'background-image': 'url(' + photo + ')'}">
+                      <br/>
+                      <p>Your match is found !</p>
+                      <img src={{fymResponseData.image}} width="70%">
+                      <p>Name: {{fymResponseData.name}}</p>
+                      <p>Match rate: {{fymResponseData.matchRate}}%</p>
+                      <br/>
+                      <br/>
+                    </div>
+                    <button type="button" class="button button1" (click)="onMatchConfirm()">Start relations</button>
+                    <button type="button" class="button button1" (click)="onConfirmModalClose()">Try again !</button>
+                  </div>
+                </div>
+                <div id="right">
+                  <div style="text-align:left; font-size: 14px;margin-left:10px;">
+                    <span>1.) API Gateway + Cognito &harr; </span><br/>
+                    <span>2.a) AWS Lambda (#1) &harr; DynamoDB ( Global Secondary Index is used )&rarr; return Match data</span><br/>
+                    <span>2.b) AWS Lambda (#1) &rarr; Step Functions &rarr; two parallel AWS Lambda functions (#2, #4)</span><br/>
+                    <span>2.b.1) AWS Lambda (#2) &rarr; SQS &rarr; AWS Lambda (#3) &rarr; S3 (*.mp3 file), DynamoDB (S3 file name, status)</span><br/>
+                    <span>2.b.2) AWS Lambda (#4) &rarr; enables CloudWatch rule to delete S3 files and DynamoDB data older than past 20 minutes</span><br/>
+                    <img src="../../assets/modalImage.png" width="60%;">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <br/>

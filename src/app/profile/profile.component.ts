@@ -36,10 +36,12 @@ export class ProfileComponent {
   hobbies = ['painting', 'wood craft', 'baking', 'cooking', 'fishing', 'robotics', 'art design', 'biking'];
   myHobbies;
 
+  photo = 'https://images.pexels.com/photos/255379/pexels-photo-255379.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500';
   hideFindForm = false;
   areChecklistsValid = true;
   isFormSubmitted = false;
   fymRequestID;
+  fymResponseData;
   candidateForm;
   a = this.assignValues();
 
@@ -178,7 +180,8 @@ export class ProfileComponent {
     // this.dataService.post(new Candidate(id, userName, otherDetails));
     this.dataService.get('single', this.fymRequestID, criteriaSet)
     .then((data) => {
-      console.log('data =', data);
+      console.log('data11 =', data);
+      this.fymResponseData = data;
       this.isFormSubmitted = true;
     });
   }
