@@ -10,10 +10,11 @@ import { Http, Headers, Response } from '@angular/http';
 export class DataService {
 
   fymRequestID;
+  fymResponseData;
   findMatchRequest: FindMatchRequest;
   stageURL =
-  // 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development';
-  'https://lmpyzv9fz8.execute-api.us-east-1.amazonaws.com/development';
+    // 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development';
+    'https://lmpyzv9fz8.execute-api.us-east-1.amazonaws.com/development';
   extn1 = '/find-your-match';
   extn2 = '/start-relations/audio';
   extn3 = '/start-relations/imagerekog';
@@ -60,7 +61,7 @@ export class DataService {
     const that = this;
     return new Promise((resolve, reject) => {
       this.authService.getCurrentUser().getSession((err, session) => {
-        console.log('JWT token ', session.getIdToken().getJwtToken());
+        // console.log('JWT token ', session.getIdToken().getJwtToken());
 
         that.http.delete(
           this.stageURL + this.extn1
@@ -85,12 +86,12 @@ export class DataService {
 
   get(type: string, id: string, criteriaSet: string) {
     // GET
-    this.fymRequestID = id;
+    if (type === 'single') { this.fymRequestID = id; }
     console.log('type', type);
     const that = this;
     return new Promise((resolve, reject) => {
       this.authService.getCurrentUser().getSession((err, session) => {
-        console.log('JWT token ', session.getIdToken().getJwtToken());
+        // console.log('JWT token ', session.getIdToken().getJwtToken());
         that.http.get(
           this.stageURL + this.extn1 + '/'
           + type
@@ -103,9 +104,19 @@ export class DataService {
           })
           .subscribe(
             (result: any) => {
-              const data = JSON.parse(result._body);
-              console.log('result = ', data);
-              resolve(data);
+              console.log('result0 = ', result);
+              if (type === 'all') {
+                const data = JSON.parse(result._body);
+                resolve(data);
+              } else if (type === 'single') {
+                const dataPre = JSON.parse(result._body);
+                const data = JSON.parse(dataPre);
+                console.log('result1 = ', data);
+                this.fymResponseData = data;
+                console.log('result2 = ', this.fymResponseData.name);
+                console.log('result2a = ', this.fymResponseData.image);
+                resolve(data);
+              }
             },
             (error) => {
               reject(error);
@@ -115,21 +126,20 @@ export class DataService {
     });
   }
 
-  getAudio(type: string, id: string) {
+  getAudio(type: string) {
     // GET
     console.log('type', type);
-    id = this.fymRequestID + '-1ULA';
     const that = this;
     return new Promise((resolve, reject) => {
       this.authService.getCurrentUser().getSession((err, session) => {
-        console.log('JWT token ', session.getIdToken().getJwtToken());
+        // console.log('JWT token ', session.getIdToken().getJwtToken());
         that.http.get(
           this.stageURL + this.extn2 + '/'
           + type
           + '?'
           + 'accessToken=' + session.getAccessToken().getJwtToken() + '&'
-          + 'candidateID=' + id + '&'
-          + 'requestorID=' + id,
+          // + 'candidateID=' + id + '&'
+          + 'candidateID=' + this.fymRequestID + '-1ULA',
           {
             headers: new Headers(
               { 'Authorization': session.getIdToken().getJwtToken() }
@@ -156,7 +166,7 @@ export class DataService {
     const that = this;
     return new Promise((resolve, reject) => {
       this.authService.getCurrentUser().getSession((err, session) => {
-        console.log('JWT token ', session.getIdToken().getJwtToken());
+        // console.log('JWT token ', session.getIdToken().getJwtToken());
         that.http.get(
           this.stageURL + this.extn3
           // + '/'

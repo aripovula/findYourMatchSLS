@@ -482,21 +482,21 @@ select {
 }
 
 #left4message {
-  width: 10%;
+  width: 14%;
   /* margin: 20px; */
 }
 
 #right4message {
-  width: 90%;
+  width: 86%;
 }
 
 #left4messageB {
-  width: 90%;
+  width: 86%;
   /* margin: 20px; */
 }
 
 #right4messageB {
-  width: 10%;
+  width: 14%;
 }
 
 .boxMessage {

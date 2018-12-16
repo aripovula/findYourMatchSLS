@@ -177,12 +177,12 @@
       <div class="scrollDiv boxed">
         <div id="container4message">
           <div id="left4message">
-            <img src="https://images.pexels.com/photos/355164/pexels-photo-355164.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" height="40px"> &nbsp;
+            <img src={{matchPersonData.image}} width="100%"> &nbsp;
             <span style="font-size: 25px; color:lightseagreen"> &nbsp; &#10149;</span>
           </div>
           <div id="right4message">
             <div class="boxMessage">
-              <span>Cindy: </span>
+              <span>{{matchPersonData.name}}: </span>
               <br/>
               <span style="font-size: 14px;">( sent you a voice message )</span>
               <span *ngFor="let greeting of greetings; let ind=index;">
@@ -214,7 +214,7 @@
             </div>
           </div>
           <div id="right4messageB">
-            <img src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" height="40px"> &nbsp;
+            <img src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" width="100%"> &nbsp;
             <!-- <span style="font-size: 34px; color:lightseagreen"> &#10149;</span> -->
           </div>
         </div>

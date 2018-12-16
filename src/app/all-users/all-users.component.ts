@@ -50,12 +50,12 @@ export class AllUsersComponent implements OnInit {
     this.onGetAllClicked();
   }
 
-  onPostClicked() {
-    const candidate = null; // new Candidate(this.id, 'Ann B 18', 'female', 'science, arts, acting');
-    this.dataService.post(candidate).then(() => {
-      this.onGetAllClicked();
-    });
-  }
+  // onPostClicked() {
+  //   const candidate = null; // new Candidate(this.id, 'Ann B 18', 'female', 'science, arts, acting');
+  //   this.dataService.post(candidate).then(() => {
+  //     this.onGetAllClicked();
+  //   });
+  // }
 
   onGetAllClicked() {
     this.dataService.get('all', '0', null)
@@ -78,21 +78,21 @@ export class AllUsersComponent implements OnInit {
   //     });
   // }
 
-  onGetAudio1Clicked(id) {
-    this.dataService.getAudio('initial', id)
-      .then((fromDB: any) => {
-        this.greetings = fromDB;
-        console.log('this.greetings=', this.greetings);
+  // onGetAudio1Clicked() {
+  //   this.dataService.getAudio('initial')
+  //     .then((fromDB: any) => {
+  //       this.greetings = fromDB;
+  //       console.log('this.greetings=', this.greetings);
 
-      })
-      .catch((error) => {
-        console.log('error - ', error);
-      });
-  }
+  //     })
+  //     .catch((error) => {
+  //       console.log('error - ', error);
+  //     });
+  // }
 
-  onPlayAudioClicked(url) {
-    new Audio(url).play();
-  }
+  // onPlayAudioClicked(url) {
+  //   new Audio(url).play();
+  // }
 
   compareById(a, b) {
     const a1 = a.id * 1;
@@ -134,9 +134,9 @@ export class AllUsersComponent implements OnInit {
     }
   }
 
-  onDeleteClicked() {
-    this.dataService.delete(this.id).then(() => {
-      this.onGetAllClicked();
-    });
-  }
+  // onDeleteClicked() {
+  //   this.dataService.delete(this.id).then(() => {
+  //     this.onGetAllClicked();
+  //   });
+  // }
 }

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { UUID } from 'angular2-uuid';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 
@@ -18,7 +19,7 @@ export class ProfileComponent {
   characters = ['rather active (outdoor, sports)', 'rather lazy'];
   behavings = ['calm', 'impulsive'];
   interests = ['sports', 'politics', 'science', 'music', 'arts', 'literature'];
-  genders = ['male', 'female', 'other'];
+  genders = ['male', 'female'];
   smokers = ['smoker', 'non-smoker'];
   smokersFind = ['smoker', 'non-smoker', 'any'];
   musicgenres = ['pop', 'smooth jazz', 'club', 'soft rock', 'country', 'hard rock'];
@@ -37,11 +38,16 @@ export class ProfileComponent {
 
   hideFindForm = false;
   areChecklistsValid = true;
+  isFormSubmitted = false;
   fymRequestID;
   candidateForm;
   a = this.assignValues();
 
-  constructor(private dataService: DataService, private cognitoService: CognitoService) { }
+  constructor(
+    private dataService: DataService,
+    private cognitoService: CognitoService,
+    private router: Router
+  ) { }
 
   assignRandom(array) {
     return array[this.getRandom(0, array.length - 1)];
@@ -173,7 +179,17 @@ export class ProfileComponent {
     this.dataService.get('single', this.fymRequestID, criteriaSet)
     .then((data) => {
       console.log('data =', data);
+      this.isFormSubmitted = true;
     });
+  }
+
+  onConfirmModalClose() {
+    this.isFormSubmitted = false;
+    this.assignValues();
+  }
+
+  onMatchConfirm() {
+    this.router.navigate(['/start']);
   }
 
 }
