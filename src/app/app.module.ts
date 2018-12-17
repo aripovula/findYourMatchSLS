@@ -7,6 +7,7 @@ import { Ng2SmartTableModule } from 'ng2-smart-table';
 import { WebcamModule } from 'ngx-webcam';
 import { FormsModule } from '@angular/forms';
 import { ImageUploadModule } from 'angular2-image-upload';
+import { NgxLoadingModule } from 'ngx-loading';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -53,6 +54,7 @@ const appRoutes: Routes = [
     WebcamModule,
     FormsModule,
     ImageUploadModule.forRoot(),
+    NgxLoadingModule.forRoot({})
   ],
   providers: [CognitoService, DataService, AuthGuard],
   bootstrap: [AppComponent]

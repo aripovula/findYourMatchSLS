@@ -12,6 +12,7 @@ import { DataService } from './../services/data.service';
 
 export class AllUsersComponent implements OnInit {
 
+  public loading = false;
   users = [];
   abc = 0;
   id = '18';
@@ -58,13 +59,16 @@ export class AllUsersComponent implements OnInit {
   // }
 
   onGetAllClicked() {
+    this.loading = true;
     this.dataService.get('all', '0', null)
       .then((fromDB: Candidate[]) => {
         // this.users = fromDB;
         this.updateTableData(fromDB);
+        this.loading = false;
       })
       .catch((error) => {
         console.log('error - ', error);
+        this.loading = false;
       });
   }
 

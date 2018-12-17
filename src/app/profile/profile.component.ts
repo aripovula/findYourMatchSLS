@@ -40,6 +40,7 @@ export class ProfileComponent {
   hideFindForm = false;
   areChecklistsValid = true;
   isFormSubmitted = false;
+  public loading = false;
   fymRequestID;
   fymResponseData;
   candidateForm;
@@ -49,7 +50,7 @@ export class ProfileComponent {
     private dataService: DataService,
     private cognitoService: CognitoService,
     private router: Router
-  ) { }
+  ) { this.loading = false; }
 
   assignRandom(array) {
     return array[this.getRandom(0, array.length - 1)];
@@ -146,6 +147,7 @@ export class ProfileComponent {
   }
 
   onSubmit() {
+    this.loading = true;
     const id = this.fymRequestID;
     const userName = this.cognitoService.cognitoUser.getUsername();
     const otherDetailsObj = {
@@ -178,11 +180,13 @@ export class ProfileComponent {
     // console.log('userName = ', userName);
     // console.log('otherDetails = ', otherDetails);
     // this.dataService.post(new Candidate(id, userName, otherDetails));
+
     this.dataService.get('single', this.fymRequestID, criteriaSet)
     .then((data) => {
       console.log('data11 =', data);
       this.fymResponseData = data;
       this.isFormSubmitted = true;
+      this.loading = false;
     });
   }
 

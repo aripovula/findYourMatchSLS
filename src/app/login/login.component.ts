@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
     user: new FormControl('Alex'),
   });
   prevUser = null;
-
+  public loading = false;
   constructor(
     private authService: CognitoService,
     private router: Router
@@ -61,6 +61,7 @@ export class LoginComponent implements OnInit {
     const password = this.loginForm.value.password;
     console.log('in Login C ' + email + ' ' + password);
     const that = this;
+    this.loading = true;
     this.authService.signIn(email, password);
   }
 }

@@ -14,7 +14,14 @@ import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 export class StartComponent implements OnInit {
 
   greetings = [];
+  conversation = [];
+  conversationStep = 0;
   matchPersonData;
+  imageToSend;
+  selfMessages = [];
+  isPopUpImageClicked = false;
+  popUpImage;
+  RekognizedData;
   // on capture image
   isCapturePhotoChosen = false;
   isPhotoCaptured = false;
@@ -45,9 +52,9 @@ export class StartComponent implements OnInit {
   webURL = '';
 
   constructor(private dataService: DataService) {
-    console.log(this.matchPersonData);
     this.onGetAudio1Clicked();
     this.matchPersonData = this.dataService.fymResponseData;
+    console.log('matchPersonData = ', this.matchPersonData);
   }
 
   ngOnInit(): void {
@@ -55,6 +62,24 @@ export class StartComponent implements OnInit {
       .then((mediaDevices: MediaDeviceInfo[]) => {
         this.multipleWebcamsAvailable = mediaDevices && mediaDevices.length > 1;
       });
+    if (this.matchPersonData != null) {
+      this.conversation[this.conversationStep] = {
+        step: this.conversationStep,
+        isSelf: false,
+        name: this.toTitleCase(this.matchPersonData.name),
+        image: this.matchPersonData.image,
+        audio: null,
+        text: null
+      };
+      console.log('this.conversation-', this.conversation);
+      this.selfMessages = [
+        'Hey ' + this.toTitleCase(this.matchPersonData.name)
+        + '. Great to meet you ! I like your photo. Here is mine.',
+        'Here you go',
+        'What do you think about this?',
+        'What about this? :)'
+      ];
+    }
   }
 
   // on capture image
@@ -80,6 +105,7 @@ export class StartComponent implements OnInit {
     });
     this.isCapturePhotoChosen = false;
     this.isPhotoCaptured = false;
+    this.imageToSend = this.webcamImage.imageAsDataUrl;
   }
 
   onCaptureAgainClicked() {
@@ -131,6 +157,7 @@ export class StartComponent implements OnInit {
   onWebsiteURLSubmit() {
     console.log('webURL = ', this.webURL);
     this.isURLorImageFileValid(this.webURL, 1, this);
+    this.imageToSend = this.webURL;
     this.webURL = '';
     this.isWebsiteURLchosen = false;
   }
@@ -144,6 +171,7 @@ export class StartComponent implements OnInit {
     console.log('onUploadFinished ind = ', file);
     this.uploaderHidden = true;
     this.imageFile = file.src;
+    this.imageToSend = file.src;
     this.isURLorImageFileValid(file.src, 2, this);
   }
 
@@ -157,11 +185,18 @@ export class StartComponent implements OnInit {
     const img = new Image();
     img.onload = () => {
       if (type === 1) {
-        that.dataService.getInfoOnURLImage('1', 'A1', URLorFileSrc)
-        .then((data) => { JSON.stringify(this.imageDescription = data); });
+        that.dataService.getInfoOnURLImage('1', this.dataService.fymRequestID, URLorFileSrc)
+          .then((data) => {
+            that.RekognizedData = data;
+            that.useRekognizedData();
+          });
       } else if (type === 2) {
         that.dataService.postImage({ _imageAsDataUrl: URLorFileSrc }).then(() => {
-          that.dataService.getInfoOnURLImage('2', '1', null);
+          that.dataService.getInfoOnURLImage('2', this.dataService.fymRequestID, 'none')
+            .then((data) => {
+              that.RekognizedData = data;
+              that.useRekognizedData();
+            });
         });
       }
     };
@@ -182,7 +217,9 @@ export class StartComponent implements OnInit {
       .then((fromDB: any) => {
         this.greetings.push(fromDB);
         console.log('this.greetings=', this.greetings);
-
+        this.conversation[this.conversationStep].audio = fromDB.url;
+        this.conversation[this.conversationStep].text = fromDB.text;
+        console.log('this.conversation-', this.conversation);
       })
       .catch((error) => {
         console.log('error - ', error);
@@ -196,5 +233,47 @@ export class StartComponent implements OnInit {
 
   onNewMessage() {
     new Audio('../../assets/stairs.mp3').play();
+  }
+
+  toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function (txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+  }
+
+  onImageSendClicked() {
+    this.conversationStep++;
+    this.conversation[this.conversationStep] = {
+      step: this.conversationStep,
+      isSelf: true,
+      name: null,
+      image: this.imageToSend,
+      audio: null,
+      text: this.selfMessages[(this.conversationStep - 1) / 2]
+    };
+  }
+
+  onPopUpImageClicked(step) {
+    this.popUpImage = this.conversation[step].image;
+    this.isPopUpImageClicked = true;
+  }
+
+  onPopUpImageClose() {
+    this.isPopUpImageClicked = false;
+    this.popUpImage = null;
+  }
+
+  useRekognizedData() {
+    const RekognizedDataBody = JSON.parse(this.RekognizedData.body);
+    // const RekognizedDataBody = this.RekognizedData.body;
+    console.log('RekognizedDataBody = ', RekognizedDataBody);
+    console.log('Labels = ', RekognizedDataBody[0]);
+    console.log('FaceDetails = ', RekognizedDataBody[1]);
+    console.log('CelebrityFaces = ', RekognizedDataBody[2]);
+    console.log('FaceMatches = ', RekognizedDataBody[3]);
+    // this.RekognizedData;
   }
 }
