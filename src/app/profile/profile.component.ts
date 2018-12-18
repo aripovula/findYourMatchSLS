@@ -174,8 +174,7 @@ export class ProfileComponent {
       intentions: this.candidateForm.value.intentions
     };
 
-    let criteriaSet = JSON.stringify(otherDetailsObj);
-    criteriaSet = encodeURIComponent(criteriaSet);
+    const criteriaSet = JSON.stringify(otherDetailsObj);
     // criteriaSet.replace(/"/g, '-%-');
     // console.log('userName = ', userName);
     // console.log('otherDetails = ', otherDetails);

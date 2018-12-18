@@ -235,10 +235,9 @@
                     <div [ngStyle]="{'background-image': 'url(' + photo + ')'}">
                       <br/>
                       <p>Your match is found !</p>
-                      <img src={{fymResponseData.image}} width="70%">
+                      <img class='img-responsive' src={{fymResponseData.image}}>
                       <p>Name: {{fymResponseData.name}}</p>
                       <p>Match rate: {{fymResponseData.matchRate}}%</p>
-                      <br/>
                       <br/>
                     </div>
                     <button type="button" class="button button1" (click)="onMatchConfirm()">Start relations</button>

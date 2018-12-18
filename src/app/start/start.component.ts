@@ -13,7 +13,7 @@ import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 
 export class StartComponent implements OnInit {
 
-  greetings = [];
+  // greetings = [];
   conversation = [];
   conversationStep = 0;
   matchPersonData;
@@ -21,7 +21,7 @@ export class StartComponent implements OnInit {
   selfMessages = [];
   isPopUpImageClicked = false;
   popUpImage;
-  RekognizedData;
+  // RekognizedData;
   // on capture image
   isCapturePhotoChosen = false;
   isPhotoCaptured = false;
@@ -52,7 +52,7 @@ export class StartComponent implements OnInit {
   webURL = '';
 
   constructor(private dataService: DataService) {
-    this.onGetAudio1Clicked();
+    this.onGetAudio1Clicked('0');
     this.matchPersonData = this.dataService.fymResponseData;
     console.log('matchPersonData = ', this.matchPersonData);
   }
@@ -65,7 +65,7 @@ export class StartComponent implements OnInit {
     if (this.matchPersonData != null) {
       this.conversation[this.conversationStep] = {
         step: this.conversationStep,
-        isSelf: false,
+        isSelf: true,
         name: this.toTitleCase(this.matchPersonData.name),
         image: this.matchPersonData.image,
         audio: null,
@@ -184,18 +184,19 @@ export class StartComponent implements OnInit {
   isURLorImageFileValid(URLorFileSrc, type: number, that) {
     const img = new Image();
     img.onload = () => {
+      that.onImageSend();
       if (type === 1) {
         that.dataService.getInfoOnURLImage('1', this.dataService.fymRequestID, URLorFileSrc)
           .then((data) => {
-            that.RekognizedData = data;
-            that.useRekognizedData();
+            // that.RekognizedData = data;
+            that.useRekognizedData(data);
           });
       } else if (type === 2) {
         that.dataService.postImage({ _imageAsDataUrl: URLorFileSrc }).then(() => {
           that.dataService.getInfoOnURLImage('2', this.dataService.fymRequestID, 'none')
             .then((data) => {
-              that.RekognizedData = data;
-              that.useRekognizedData();
+              // that.RekognizedData = data;
+              that.useRekognizedData(data);
             });
         });
       }
@@ -212,19 +213,62 @@ export class StartComponent implements OnInit {
     img.src = URLorFileSrc;
   }
 
-  onGetAudio1Clicked() {
-    this.dataService.getAudio('initial')
+  onGetAudio1Clicked(mp3SeqNumb: string) {
+    this.dataService.getAudio('check', mp3SeqNumb, 'none')
       .then((fromDB: any) => {
-        this.greetings.push(fromDB);
-        console.log('this.greetings=', this.greetings);
-        this.conversation[this.conversationStep].audio = fromDB.url;
-        this.conversation[this.conversationStep].text = fromDB.text;
+        // this.greetings.push(fromDB);
+        // console.log('this.greetings=', this.greetings);
+        console.log('audio status = ', fromDB);
+        if (fromDB == null) {
+          setTimeout(() => this.onGetAudio1Clicked(mp3SeqNumb), 2000);
+        } else if (fromDB.status === 'READY') {
+          if (mp3SeqNumb === '0') {
+            this.conversation[mp3SeqNumb].isSelf = false;
+            this.conversation[mp3SeqNumb].audio = fromDB.url;
+            this.conversation[mp3SeqNumb].text = fromDB.text;
+          } else {
+            this.addNewMessage(fromDB);
+          }
+        } else {
+          setTimeout(() => this.onGetAudio1Clicked(mp3SeqNumb), 2000);
+        }
+
+        console.log('fromDB = ', fromDB);
         console.log('this.conversation-', this.conversation);
       })
       .catch((error) => {
         console.log('error - ', error);
       })
       ;
+  }
+
+  onRequestAudioSynth(text) {
+    const params = JSON.stringify({
+      gender: JSON.parse(this.dataService.fymCriteriaSet).genderFind,
+      text
+    });
+    const seqNumb = this.conversationStep + 1;
+    this.dataService.getAudio('addNew', '' + seqNumb, params)
+      .then((data) => {
+        console.log('after onRequestAudioSynth = ', data);
+        console.log('in onRequestAudioSynth seqNumb = ', seqNumb);
+        this.onGetAudio1Clicked('' + seqNumb);
+      });
+  }
+
+  addNewMessage(data) {
+    console.log('in addNewMessage data =', data);
+    this.conversationStep++;
+    this.conversation[this.conversationStep] = {
+      step: this.conversationStep,
+      isSelf: false,
+      name: null,
+      image: null,
+      audio: data.url,
+      text: data.text
+    };
+    console.log('this.conversationStep = ', this.conversationStep);
+    console.log('this.conversation[this.conversationStep] = ', this.conversation[this.conversationStep]);
   }
 
   onPlayAudioClicked(url) {
@@ -244,7 +288,7 @@ export class StartComponent implements OnInit {
     );
   }
 
-  onImageSendClicked() {
+  onImageSend() {
     this.conversationStep++;
     this.conversation[this.conversationStep] = {
       step: this.conversationStep,
@@ -254,6 +298,7 @@ export class StartComponent implements OnInit {
       audio: null,
       text: this.selfMessages[(this.conversationStep - 1) / 2]
     };
+    this.imageToSend = null;
   }
 
   onPopUpImageClicked(step) {
@@ -266,14 +311,33 @@ export class StartComponent implements OnInit {
     this.popUpImage = null;
   }
 
-  useRekognizedData() {
-    const RekognizedDataBody = JSON.parse(this.RekognizedData.body);
+  useRekognizedData(RekognizedData) {
+    const RekognizedDataBody = JSON.parse(RekognizedData.body);
     // const RekognizedDataBody = this.RekognizedData.body;
     console.log('RekognizedDataBody = ', RekognizedDataBody);
     console.log('Labels = ', RekognizedDataBody[0]);
     console.log('FaceDetails = ', RekognizedDataBody[1]);
     console.log('CelebrityFaces = ', RekognizedDataBody[2]);
     console.log('FaceMatches = ', RekognizedDataBody[3]);
+    const Labels = RekognizedDataBody[0];
+    const FaceDetails = RekognizedDataBody[1];
+    const CelebrityFaces = RekognizedDataBody[2];
+    const FaceMatches = RekognizedDataBody[3];
+
     // this.RekognizedData;
+
+    const isCelebrity = CelebrityFaces[0].Name;
+    const isCelebrityConf = CelebrityFaces[0].MatchConfidence;
+    console.log('isCelebrity=', isCelebrity, isCelebrityConf);
+
+    let howMuchAlike;
+    if (isCelebrityConf > 90) { howMuchAlike = 'exactly'; }
+    if (isCelebrityConf > 80 && isCelebrityConf <= 90) { howMuchAlike = 'almost'; }
+    if (isCelebrityConf > 70 && isCelebrityConf <= 80) { howMuchAlike = 'a little'; }
+    let newText = isCelebrityConf > 70 ? 'Hey, you look ' + howMuchAlike + ' like ' + isCelebrity : '';
+    newText = newText + '';
+    console.log('before audit synth with text = ', newText);
+    this.onRequestAudioSynth(newText);
+
   }
 }

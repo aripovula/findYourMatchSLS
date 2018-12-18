@@ -11,6 +11,7 @@ export class DataService {
 
   fymRequestID;
   fymResponseData;
+  fymCriteriaSet;
   findMatchRequest: FindMatchRequest;
   stageURL =
     // 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development';
@@ -86,6 +87,7 @@ export class DataService {
 
   get(type: string, id: string, criteriaSet: string) {
     // GET
+    this.fymCriteriaSet = criteriaSet;
     if (type === 'single') { this.fymRequestID = id; }
     console.log('type', type);
     const that = this;
@@ -97,8 +99,8 @@ export class DataService {
           + type
           + '?'
           + 'accessToken=' + session.getAccessToken().getJwtToken() + '&'
-          + 'criteriaSet=' + criteriaSet + '&'
-          + 'candidateID=' + id,
+          + 'criteriaSet=' + encodeURIComponent(criteriaSet) + '&'
+          + 'candidateID=' + id + '-0ULA',
           {
             headers: new Headers({ 'Authorization': session.getIdToken().getJwtToken() })
           })
@@ -126,7 +128,7 @@ export class DataService {
     });
   }
 
-  getAudio(type: string) {
+  getAudio(type: string, mp3SeqNumb: string, params: string) {
     // GET
     console.log('type', type);
     const that = this;
@@ -138,8 +140,8 @@ export class DataService {
           + type
           + '?'
           + 'accessToken=' + session.getAccessToken().getJwtToken() + '&'
-          // + 'candidateID=' + id + '&'
-          + 'candidateID=' + this.fymRequestID + '-1ULA',
+          + 'params=' + encodeURIComponent(params) + '&'
+          + 'candidateID=' + this.fymRequestID + '-' + mp3SeqNumb + 'ULA',
           {
             headers: new Headers(
               { 'Authorization': session.getIdToken().getJwtToken() }

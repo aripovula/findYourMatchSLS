@@ -5,7 +5,7 @@
         <div style="font-size: 14px;">
           <p>Audio is generated using Amazon Polly - voices: Salli (F), Matthew (M).</p>
           <div *ngIf="matchPersonData">
-            <p>First message mp3 file url: {{conversation[conversationStep].audio}}</p>
+            <p>Last message mp3 file url: {{conversation[conversationStep].audio}}</p>{{conversationStep}}
           </div>
           <p>The Lambda function (using AWS Rekognition &larr; spelled correctly - as by AWS) :</p>
           <div style="margin-left: 40px;">
@@ -102,7 +102,7 @@
                     </div>
                     <div class="modal-body">
                       <br/>
-                      <img src={{popUpImage}} width="68%">
+                      <img class='img-responsive' src={{popUpImage}}>
                       <br/>
                       <button type="button" class="button button1" (click)="onPopUpImageClose()">Close</button>
                     </div>
@@ -174,13 +174,13 @@
                           <br/>
                           <p>Image URL is not valid !</p>
                           <p>Please right click on an image and use 'Copy image address' and NOT 'Copy link address'</p>
+                          <img src="../../assets/copyURL.png" width="40%;">
                         </div>
                         <div *ngIf="isNotValidImageProvided">
                           <br/>
                           <p>Image file is not valid !</p>
                           <p>Please make sure that uploaded file is of 'jpeg', 'png' or 'gif' types.</p>
                         </div>
-                        <img src="../../assets/copyURL.png" width="40%;">
                         <br/>
                         <button type="button" class="button button1" (click)="onNotValidImageClose()">OK</button>
                         <br/>
@@ -208,12 +208,12 @@
             <div *ngIf="!aMessage.isSelf">
               <div id="container4message">
                 <div id="left4message">
-                  <img src={{aMessage.image}} width="100%"> &nbsp;
+                  <img src={{conversation[0].image}} width="100%"> &nbsp;
                   <span style="font-size: 25px; color:lightseagreen"> &nbsp; &#10149;</span>
                 </div>
                 <div id="right4message">
                   <div class="boxMessage">
-                    <span>{{aMessage.name}}: </span>
+                    <span>{{conversation[0].name}}: </span>
                     <br/>
                     <span style="font-size: 14px;">( sent you a voice message )</span>
                     &nbsp;
@@ -225,7 +225,7 @@
                 </div>
               </div>
             </div>
-            <div *ngIf="aMessage.isSelf">
+            <div *ngIf="aMessage.isSelf && conversationStep > 0">
               <div id="container4message">
                 <div id="left4messageB">
                   <div class="boxMessageB">
@@ -243,14 +243,6 @@
             </div>
             <span class="verIndent"></span>
           </div>
-          <div *ngIf="!conversation[conversationStep].isSelf">
-            <hr/>
-            <span *ngIf="imageToSend">
-              <img src={{imageToSend}} width="50%">
-              <span class="horIndent"></span>
-            </span>
-            <button style="float: right" class="buttonMessage" (click)="onImageSendClicked();"> &nbsp; &nbsp; &nbsp; Send &nbsp; &nbsp; &nbsp;</button>
-          </div>
           <div *ngIf="conversation[conversationStep].isSelf">
             <br/>
             <div id="container4message">
@@ -266,11 +258,18 @@
             </div>
           </div>
         </div>
+        <div>
+          <hr/>
+          <button style="float: right" class="buttonMessage"> &nbsp; &nbsp; &nbsp; Send &nbsp; &nbsp; &nbsp;</button>
+        </div>
+
       </div>
       <div *ngIf="matchPersonData && !conversation[conversationStep].isSelf">
         <span class="verIndent"></span>
-        <span style="margin-left: 20px; color: brown; size: 20px;" *ngIf="!imageToSend">Please add "your" photo ( OR add photo of a celebrity ! )
-          <br/>Please use one of buttons on the left panel.
+        <span style="color: brown; size: 20px;" *ngIf="!imageToSend">
+          <span style="margin-left: 20px;">Please add "your" photo ( OR add photo of a celebrity ! )</span>
+          <br/>
+          <span style="margin-left: 20px;">For this please use one of buttons on the left panel.</span>
         </span>
       </div>
       <!-- Labels: {{RekognizedData.body.Labels}} -->

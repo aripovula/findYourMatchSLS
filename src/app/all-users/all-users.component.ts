@@ -43,7 +43,7 @@ export class AllUsersComponent implements OnInit {
   };
 
   data = [];
-  greetings = [];
+  // greetings = [];
 
   constructor(private dataService: DataService) { }
 

@@ -273,7 +273,7 @@ previewPanel {
 }
 
 .buttonMessage:hover {
-  background-color:lightgray;
+  background-color: lightgray;
 }
 
 .header {
@@ -558,6 +558,28 @@ body {
   animation-duration: 0.4s
 }
 
+.modal-header {
+  padding: 2px 16px;
+  background-color: #80d5eb;
+  color: white;
+}
+
+.modal-body {
+  padding: 2px 26px;
+  overflow-y: scroll;
+}
+
+.modal-footer {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+}
+
+.img-responsive {
+  max-height: calc(100vh - 400px);
+  max-width: 90%;
+}
+
 /* Add Animation */
 
 @-webkit-keyframes animatetop {
@@ -582,7 +604,7 @@ body {
   }
 }
 
-/* The Close Button */
+/* The MODAL Close Button */
 
 .close {
   color: white;
@@ -595,20 +617,4 @@ body {
   color: #000;
   text-decoration: none;
   cursor: pointer;
-}
-
-.modal-header {
-  padding: 2px 16px;
-  background-color: #80d5eb;
-  color: white;
-}
-
-.modal-body {
-  padding: 2px 26px;
-}
-
-.modal-footer {
-  padding: 2px 16px;
-  background-color: #5cb85c;
-  color: white;
 }
