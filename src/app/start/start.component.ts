@@ -339,20 +339,67 @@ export class StartComponent implements OnInit {
     const CelebrityFaces = RekognizedDataBody[2];
     const FaceMatches = RekognizedDataBody[3];
 
-    const genderSelf = JSON.parse(this.dataService.fymCriteriaSet).genderSelf;
+    const genderSelfLc = JSON.parse(this.dataService.fymCriteriaSet).genderSelf;
+    const genderSelf = this.toTitleCase(genderSelfLc);
     const Gender = (FaceDetails != null && FaceDetails[0] != null) ? FaceDetails[0].Gender.Value : genderSelf;
+
+    console.log('FaceDetails.length=', FaceDetails.length);
+    console.log('genderSelf + Gender=', genderSelf, Gender);
 
     if (FaceDetails == null && this.conversationStep === 1 ||
           FaceDetails.length === 0 && this.conversationStep === 1) {
       newText = this.add('Hey, I asked for your photo. I do not see any human faces here !', newText);
-    } else if (Gender.toLowerCase() !== genderSelf) {
-      const aText = 'Hey, you said that your gender is ' + genderSelf + '. And I wonder why you are sending photo of a ' + Gender;
+    } else if (FaceDetails.length > 2) {
+      newText = this.add('Hey, I asked for your photo only. I see ' + FaceDetails.length + ' faces here !', newText);
+    } else if (FaceDetails.length === 2) {
+      console.log('in 2 faces');
+      console.log('FaceDetails[0].Gender.Value = ', FaceDetails[0].Gender.Value);
+      console.log('FaceDetails[1].Gender.Value = ', FaceDetails[1].Gender.Value);
+      console.log('genderSelf = ', genderSelf);
+
+      if (FaceDetails[0].Gender.Value === genderSelf && FaceDetails[1].Gender.Value === genderSelf) {
+        console.log('in 2 a');
+        if (FaceDetails[0].AgeRange.Low >= 18 && FaceDetails[1].AgeRange.Low >= 18) {
+          newText = this.add('I see two ' + genderSelfLc + 's here. I do not know which one is you !', newText);
+        } else if (FaceDetails[0].AgeRange.Low >= 18 || FaceDetails[1].AgeRange.Low >= 18) {
+          newText = this.add('I see two ' + genderSelfLc + 's here. Since one of them looks too young I guess other one is you !', newText);
+        } else {
+          newText = this.add('I see two ' + genderSelfLc + 's here. But both of them look too young. One of them is you ?', newText);
+        }
+      } else if (!(FaceDetails[0].Gender.Value === genderSelf) && !(FaceDetails[1].Gender.Value === genderSelf)) {
+        console.log('in 2 b');
+        const oppGender = genderSelf === 'Male' ? 'female' : 'male';
+        newText = this.add('Hey, I asked for your photo. I see two ' + oppGender + 's here !', newText);
+      } else if (FaceDetails[0].Gender.Value === genderSelf && !(FaceDetails[1].Gender.Value === genderSelf) ||
+      !(FaceDetails[0].Gender.Value === genderSelf) && FaceDetails[1].Gender.Value === genderSelf) {
+        console.log('in 2 c');
+        console.log('in TWO DIF GENDERS');
+        if (FaceDetails[0].AgeRange.Low >= 18 && FaceDetails[1].AgeRange.Low >= 18) {
+          const oppGender = genderSelf === 'Male' ? 'she' : 'he';
+          newText = this.add('I see one man and one woman here. Who is ' + oppGender + ' ?', newText);
+        } else if (FaceDetails[0].AgeRange.Low >= 18 || FaceDetails[1].AgeRange.Low >= 18) {
+          if (FaceDetails[0].AgeRange.Low >= 18 && FaceDetails[1].Gender.Value === genderSelf) {
+            const oppGender = genderSelf === 'Male' ? 'girl' : 'boy';
+            const oppGender1 = genderSelf === 'Male' ? 'she' : 'he';
+            const oppGender2 = genderSelf === 'Male' ? 'daughter' : 'son';
+            newText = this.add('I see a young ' + oppGender + '. Who is ' + oppGender1 + '? Your ' + oppGender2 + '?', newText);
+          } else if (FaceDetails[0].AgeRange.Low < 18 && FaceDetails[1].Gender.Value === genderSelf) {
+            const oppGender = genderSelf === 'Male' ? 'female' : 'male';
+            newText = this.add('Well, I see only one ' + oppGender + 'here and you look too young.', newText);
+          }
+        } else {
+          newText = this.add('I see two ' + genderSelfLc + 's here. But both of them look too young. One of them is you ?', newText);
+        }
+
+      }
+    } else if (Gender !== genderSelf) {
+      const aText = 'Hey, you said that your gender is ' + genderSelfLc + '. And I wonder why you are sending photo of a ' + Gender;
       newText = this.add(aText, newText);
 
     } else {
       // this.RekognizedData;
-
-      if (CelebrityFaces.length > 0) {
+      console.log('in ELSE LARGE');
+      if (CelebrityFaces.length === 1) {
         const isCelebrity = CelebrityFaces[0].Name;
         const isCelebrityConf = CelebrityFaces[0].MatchConfidence;
         console.log('isCelebrity=', isCelebrity, isCelebrityConf);
@@ -364,10 +411,19 @@ export class StartComponent implements OnInit {
         console.log('who = ', who);
         const Text = isCelebrityConf > 70 ? wow + who + howMuchAlike + ' like ' + isCelebrity + '. ' : '';
         newText = this.add(Text, newText);
+      } else if (CelebrityFaces.length > 1) {
+        console.log('in CELEBS >1');
+        let celebrities = '';
+        for (let x = 0; x < CelebrityFaces.length; x++) {
+          if (x !== CelebrityFaces.length - 1 || CelebrityFaces.length === 1) {
+            if (x === 0) { celebrities = CelebrityFaces[x].Name; } else { celebrities = celebrities + ', ' + CelebrityFaces[x].Names; }
+          } else { celebrities = celebrities + ' and ' + CelebrityFaces[x].Name; }
+        }
+        newText = this.add(' These people look like ' + celebrities + '.', newText);
       }
 
       if (FaceDetails != null && FaceDetails.length > 0) {
-
+          console.log('in FACE DETAILS > 0');
 
         this.AgeRange = FaceDetails[0].AgeRange != null ? FaceDetails[0].AgeRange.Low + ' and ' + FaceDetails[0].AgeRange.High : false;
 
@@ -430,7 +486,7 @@ export class StartComponent implements OnInit {
     }
 
     console.log('before audio synth with text = ', newText);
-    this.onRequestAudioSynth(newText);
+    if (newText.length > 0) { this.onRequestAudioSynth(newText); }
 
   }
 
