@@ -5,7 +5,7 @@
         <div style="font-size: 14px;">
           <p>Audio is generated using Amazon Polly - voices: Salli (F), Matthew (M).</p>
           <div *ngIf="matchPersonData">
-            <p>Last message mp3 file url: {{conversation[conversationStep].audio}}</p>{{conversationStep}}
+            <p>Current message mp3 file url: {{conversation[conversationStep].audio}}</p>
           </div>
           <p>The Lambda function (using AWS Rekognition &larr; spelled correctly - as by AWS) :</p>
           <div style="margin-left: 40px;">
@@ -215,10 +215,22 @@
                   <div class="boxMessage">
                     <span>{{conversation[0].name}}: </span>
                     <br/>
-                    <span style="font-size: 14px;">( sent you a voice message )</span>
-                    &nbsp;
-                    <button class="buttonMessage" (click)="onPlayAudioClicked(aMessage.audio)">play audio</button>
-                    <br/>
+                    <span *ngIf="aMessage.audio">
+                      <span style="font-size: 14px;">( sent you a voice message )</span>
+                      &nbsp;
+                      <button class="buttonMessage" (click)="onPlayAudioClicked(aMessage.audio)">play audio</button>
+                      <br/>
+                    </span>
+                    <span *ngIf="AgeRange && conversationStep == ind">Ok, what do we see here? I guess
+                      <span *ngIf="AgeRange && conversationStep == 2"> your age </span>
+                       <span *ngIf="AgeRange && conversationStep > 2"> the age of the person in photo </span>
+                       is between 
+                      <span *ngIf="!showAge"><a class="addnlightbg" style="cursor: pointer;" 
+                        (click)="canShowAge()">(show age range). </a></span>
+                      <span *ngIf="showAge">{{AgeRange}}. </span>
+                      <!--I hope I did not miss 
+                    <img src="../../assets/wonder.png" width="9%;"> .  -->
+                    </span>
                     <span>{{aMessage.text}}</span>
                     <br/>
                   </div>
@@ -264,13 +276,21 @@
         </div>
 
       </div>
-      <div *ngIf="matchPersonData && !conversation[conversationStep].isSelf">
+      <div *ngIf="matchPersonData && !conversation[conversationStep].isSelf && conversationStep == 0">
         <span class="verIndent"></span>
         <span style="color: brown; size: 20px;" *ngIf="!imageToSend">
           <span style="margin-left: 20px;">Please add "your" photo ( OR add photo of a celebrity ! )</span>
           <br/>
           <span style="margin-left: 20px;">For this please use one of buttons on the left panel.</span>
         </span>
+      </div>
+      <div *ngIf="matchPersonData && !conversation[conversationStep].isSelf && conversationStep == 2">
+        <span class="verIndent"></span>
+        <span style="color: brown; size: 20px;" *ngIf="!imageToSend">
+          <span style="margin-left: 20px;">Please add photo of a celebrity person ! )</span>
+          <br/>
+          <span style="margin-left: 20px;">For this please use one of buttons on the left panel.</span>
+        </span>        
       </div>
       <!-- Labels: {{RekognizedData.body.Labels}} -->
     </div>

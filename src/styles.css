@@ -482,21 +482,21 @@ select {
 }
 
 #left4message {
-  width: 14%;
+  width: 10%;
   /* margin: 20px; */
 }
 
 #right4message {
-  width: 86%;
+  width: 90%;
 }
 
 #left4messageB {
-  width: 86%;
+  width: 90%;
   /* margin: 20px; */
 }
 
 #right4messageB {
-  width: 14%;
+  width: 10%;
 }
 
 .boxMessage {
@@ -579,6 +579,7 @@ body {
   max-height: calc(100vh - 400px);
   max-width: 90%;
 }
+
 
 /* Add Animation */
 
