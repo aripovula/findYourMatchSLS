@@ -225,9 +225,9 @@
                       <button class="buttonMessage" (click)="onPlayAudioClicked(aMessage.audio)">play audio</button>
                       <br/>
                     </span>
-                    <span *ngIf="AgeRange && conversationStep == ind">Ok, what do we see here? I guess
-                      <span *ngIf="AgeRange && conversationStep == 2"> your age </span>
-                       <span *ngIf="AgeRange && conversationStep > 2"> the age of the person in photo </span>
+                    <span *ngIf="AgeRange && conversationStep == ind">I guess
+                      <span *ngIf="AgeRange && stepAtFunctionStart == 1"> your age </span>
+                       <span *ngIf="AgeRange && stepAtFunctionStart === 2"> the age of the person in photo </span>
                        is between 
                       <span *ngIf="!showAge"><a class="addnlightbg" style="cursor: pointer;" 
                         (click)="canShowAge()">(show age range). </a></span>
@@ -276,7 +276,8 @@
         </div>
         <div>
           <hr/>
-          <button style="float: right" class="buttonMessage"> &nbsp; &nbsp; &nbsp; Send &nbsp; &nbsp; &nbsp;</button>
+<button style="float: right" class="buttonMessage" (click)="onWebsiteUrlClicked();"> &nbsp; &nbsp; &nbsp; Send &nbsp; &nbsp; &nbsp;</button>
+
         </div>
 
       </div>
