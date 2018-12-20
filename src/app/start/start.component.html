@@ -59,7 +59,7 @@
                   <div class="modal-body">
                     <br/>
                     <span>Image URL: &nbsp;</span>
-                    <input type="text" id="webURL" name="webURL" [(ngModel)]="webURL">
+                    <input type="text" id="webURL" name="webURL" [(ngModel)]="webURL" autofocus>
                     <!-- <span>(ngModelChange)="onWebURLChange()"</span> -->
                     <br/>
                     <br/>
@@ -203,7 +203,7 @@
       </div>
     </div>
     <div id="right">
-      <div class="scrollDiv boxed">
+      <div class="scrollDiv boxedUpper" style="overflow: scroll; height: xyz;" #scrollMe [scrollTop]="scrollMe.scrollHeight">
         <div *ngIf="!matchPersonData">
           <p>( to start relations please first find your match )</p>
         </div>
@@ -225,17 +225,23 @@
                       <button class="buttonMessage" (click)="onPlayAudioClicked(aMessage.audio)">play audio</button>
                       <br/>
                     </span>
-                    <span *ngIf="AgeRange && conversationStep == ind">I guess
+                    <span *ngIf="AgeRange && conversationStep == ind && stepAtFunctionStart < 3">I guess
                       <span *ngIf="AgeRange && stepAtFunctionStart == 1"> your age </span>
-                       <span *ngIf="AgeRange && stepAtFunctionStart === 2"> the age of the person in photo </span>
-                       is between 
-                      <span *ngIf="!showAge"><a class="addnlightbg" style="cursor: pointer;" 
-                        (click)="canShowAge()">(show age range). </a></span>
+                      <span *ngIf="AgeRange && stepAtFunctionStart === 2"> the age of the person in photo </span>
+                      is between
+                      <span *ngIf="!showAge">
+                        <a class="addnlightbg" style="cursor: pointer;" (click)="canShowAge()">(show age range). </a>
+                      </span>
                       <span *ngIf="showAge">{{AgeRange}}. </span>
-                      <!--I hope I did not miss 
-                    <img src="../../assets/wonder.png" width="9%;"> .  -->
                     </span>
                     <span>{{aMessage.text}}</span>
+                    <div *ngIf="stepAtFunctionStart==5 && conversationStep == ind">
+                      <img src="../../assets/smile.png" width="14%;">
+                      <img src="../../assets/kiss.png" width="14%;">
+                      <hr/>
+                      <p>[ You have been marked as Liked person by {{conversation[0].name}}. Congratulations! Your relationships
+                        are confirmed now ]</p>
+                    </div>
                     <br/>
                   </div>
                 </div>
@@ -274,14 +280,23 @@
             </div>
           </div>
         </div>
-        <div>
-          <hr/>
-<button style="float: right" class="buttonMessage" (click)="onWebsiteUrlClicked();"> &nbsp; &nbsp; &nbsp; Send &nbsp; &nbsp; &nbsp;</button>
-
-        </div>
-
       </div>
-      <div *ngIf="matchPersonData && !conversation[conversationStep].isSelf && conversationStep == 0">
+      <div class="boxedBottom">
+        <div>
+          <div *ngIf="stepAtFunctionStart < 5">
+            <button style="float: right; height: 36px;" class="buttonMessage" (click)="onWebsiteUrlClicked();"> &nbsp; &nbsp; &nbsp; Send &nbsp; &nbsp; &nbsp;</button>
+          </div>
+          <div *ngIf="stepAtFunctionStart == 5">
+            <button style="float: right; height: 36px;" class="buttonMessage" (click)="onRestartClicked();"> &nbsp; &nbsp; &nbsp; Restart &nbsp; &nbsp; &nbsp;</button>
+          </div>
+        </div>
+        <div *ngIf="stepAtFunctionStart == 5">
+          <div>
+
+          </div>
+        </div>
+      </div>
+      <div id="atBottom2" *ngIf="matchPersonData && !conversation[conversationStep].isSelf && stepAtFunctionStart == 1">
         <span class="verIndent"></span>
         <span style="color: brown; size: 20px;" *ngIf="!imageToSend">
           <span style="margin-left: 20px;">Please add "your" photo ( OR add photo of a celebrity ! )</span>
@@ -289,13 +304,13 @@
           <span style="margin-left: 20px;">For this please use one of buttons on the left panel.</span>
         </span>
       </div>
-      <div *ngIf="matchPersonData && !conversation[conversationStep].isSelf && conversationStep == 2">
+      <div id="atBottom2" *ngIf="matchPersonData && !conversation[conversationStep].isSelf && stepAtFunctionStart == 2">
         <span class="verIndent"></span>
         <span style="color: brown; size: 20px;" *ngIf="!imageToSend">
           <span style="margin-left: 20px;">Please add photo of a celebrity person ! )</span>
           <br/>
           <span style="margin-left: 20px;">For this please use one of buttons on the left panel.</span>
-        </span>        
+        </span>
       </div>
       <!-- Labels: {{RekognizedData.body.Labels}} -->
     </div>

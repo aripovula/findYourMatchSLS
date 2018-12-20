@@ -79,6 +79,30 @@ body, html {
   border-radius: 2px;
 }
 
+.boxedUpper {
+  width: 92%;
+  height: calc(100vh - 250px);
+  padding: 15px;
+  margin: 5px;
+  margin-left: 2%;
+  color: green;
+  text-align: left;
+  border: green solid 2px;
+  border-radius: 2px;
+}
+
+.boxedBottom {
+  width: 92%;
+  height: 40px;
+  padding: 15px;
+  margin: 5px;
+  margin-left: 2%;
+  color: green;
+  text-align: left;
+  border: green solid 2px;
+  border-radius: 2px;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -143,6 +167,13 @@ body, html {
 
 .margintop {
   margin-top: 35px;
+}
+
+#atBottom {
+  position: fixed;
+  bottom: 0;
+  width: 96%;
+  height: 10%;
 }
 
 .post-container {
@@ -526,7 +557,7 @@ body {
   /* Stay in place */
   z-index: 1;
   /* Sit on top */
-  padding-top: 100px;
+  padding-top: 62px;
   /* Location of the box */
   left: 0;
   top: 0;
@@ -577,7 +608,7 @@ body {
 
 .img-responsive {
   max-height: calc(100vh - 400px);
-  max-width: 90%;
+  max-width: 72%;
 }
 
 

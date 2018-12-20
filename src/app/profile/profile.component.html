@@ -236,9 +236,10 @@
                       <br/>
                       <p>Your match is found !</p>
                       <img class='img-responsive' src={{fymResponseData.image}}>
-                      <p>Name: {{fymResponseData.name}}</p>
+                      <p>Name: {{fymResponseData.name}} <sup>*</sup></p>
                       <p>Match rate: {{fymResponseData.matchRate}}%</p>
-                      <br/>
+                      <!-- <br/> -->
+                      <span style="font-size: 12px; margin-left: 5px; margin-right: 10px;">* all matched users are pseudo-users and their names are made up. Actual names of people in images may be different. Images are taken from and used per CC0 License of www.pexels.com</span>
                     </div>
                     <button type="button" class="button button1" (click)="onMatchConfirm()">Start relations</button>
                     <button type="button" class="button button1" (click)="onConfirmModalClose()">Try again !</button>

@@ -55,7 +55,7 @@ export class StartComponent implements OnInit {
 
   // forUseRekognition
   currentStep = 1;
-  stepAtFunctionStart;
+  stepAtFunctionStart = 1;
 
 
   constructor(private dataService: DataService) {
@@ -482,9 +482,10 @@ export class StartComponent implements OnInit {
             const isBeard = FaceDetails[0].Beard != null ? FaceDetails[0].Beard.Value : false;
             if (isBeard) { iLikes.push('beard'); }
             if (Gender === 'Male' && !isBeard) { iGlads.push('beard'); }
-            const isMoustach = FaceDetails[0].Mustache != null ? FaceDetails[0].Mustache.Value : false;
-            if (isMoustach) { iLikes.push('moustach'); }
-            if (Gender === 'Male' && !isMoustach) { iGlads.push('moustach'); }
+            // Removed. Rekognition makes many errors saying there is no moustache when there is a solid one.
+            // const isMoustach = FaceDetails[0].Mustache != null ? FaceDetails[0].Mustache.Value : false;
+            // if (isMoustach) { iLikes.push('moustach'); }
+            // if (Gender === 'Male' && !isMoustach) { iGlads.push('moustach'); }
             const isSunGlass = FaceDetails[0].Sunglasses != null ? FaceDetails[0].Sunglasses.Value : false;
             const isEyeGlass = FaceDetails[0].Eyeglasses != null ? FaceDetails[0].Eyeglasses.Value : false;
             if (isSunGlass || isEyeGlass) { iLikes.push('glasses'); }
@@ -554,8 +555,10 @@ export class StartComponent implements OnInit {
       });
       if (items.length > 0) {
         const Text1 = this.makeCommaAndText(items);
-        newText = newText + ' Ok, I am glad that you have some spare time activity. I can see here ' + Text1 + '. I like all this.';
-        this.currentStep = 4;
+        // tslint:disable-next-line:max-line-length
+        newText = newText + ' Ok, I am glad that you have some spare time activity. I can see here ' + Text1 + '. I like all this. Whoops, I may be late to get something important done. I would like to keep in touch with you. Talk to you soon !';
+        this.currentStep = 5;
+        this.stepAtFunctionStart = 5;
       } else { repeatStepFour = true; }
     }
 
