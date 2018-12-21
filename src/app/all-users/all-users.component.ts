@@ -32,7 +32,7 @@ export class AllUsersComponent implements OnInit {
         width: '10%'
       },
       userName: {
-        title: 'User name',
+        title: 'User name ( see Note )',
         type: 'html'
       },
       criteriaSet: {

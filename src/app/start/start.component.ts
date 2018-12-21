@@ -1,9 +1,10 @@
-import { DataService } from './../services/data.service';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { WebcamImage, WebcamInitError, WebcamUtil } from 'ngx-webcam';
 
+import { DataService } from './../services/data.service';
 
 @Component({
   selector: 'app-start',
@@ -23,6 +24,10 @@ export class StartComponent implements OnInit {
   popUpImage;
   AgeRange;
   showAge = false;
+  LabelsToDisplay;
+  FaceDetailsToDisplay;
+  CelebrityDataToDisplay;
+  FaceMatchesToDisplay;
 
   // on capture image
   isCapturePhotoChosen = false;
@@ -58,7 +63,7 @@ export class StartComponent implements OnInit {
   stepAtFunctionStart = 1;
 
 
-  constructor(private dataService: DataService) {
+  constructor(private dataService: DataService, private router: Router) {
     this.onGetAudio1Clicked('0');
     this.matchPersonData = this.dataService.fymResponseData;
     console.log('matchPersonData = ', this.matchPersonData);
@@ -83,8 +88,8 @@ export class StartComponent implements OnInit {
         'Hey ' + this.toTitleCase(this.matchPersonData.name)
         + '. Great to meet you ! I like your photo. Here is mine.',
         'Here you go',
-        'What do you think about this?',
-        'What about this? :)'
+        'Sure, my favorites are',
+        'Well, this should describe it '
       ];
     }
   }
@@ -157,16 +162,31 @@ export class StartComponent implements OnInit {
     this.isWebsiteURLchosen = true;
   }
 
-  onWebsiteURLClose() {
-    this.isWebsiteURLchosen = false;
-  }
-
   onWebsiteURLSubmit() {
     console.log('webURL = ', this.webURL);
     this.isURLorImageFileValid(this.webURL, 1, this);
     this.imageToSend = this.webURL;
     this.webURL = '';
     this.isWebsiteURLchosen = false;
+  }
+
+  onImageURLchange(event) {
+    console.log('event = ', event);
+    const that = this;
+    const img = new Image();
+    img.onload = () => {
+      that.webURL = event;
+      that.isURLorImageFileValid(this.webURL, 1, this);
+      that.imageToSend = this.webURL;
+      that.webURL = '';
+      that.isWebsiteURLchosen = false;
+    };
+    img.onerror = function () {
+      that.isNotValidImage = true;
+      that.isNotValidURLprovided = true;
+      that.webURL = '';
+    };
+    img.src = event;
   }
 
   // on image upload from local file
@@ -196,7 +216,6 @@ export class StartComponent implements OnInit {
       if (type === 1) {
         that.dataService.getInfoOnURLImage('1', this.dataService.fymRequestID, URLorFileSrc)
           .then((data) => {
-            // that.RekognizedData = data;
             that.useRekognizedData(data);
           })
           .catch((err) => {
@@ -315,7 +334,7 @@ export class StartComponent implements OnInit {
       name: null,
       image: this.imageToSend,
       audio: null,
-      text: this.selfMessages[(this.conversationStep - 1) / 2]
+      text: this.selfMessages[this.currentStep - 1]
     };
     this.imageToSend = null;
   }
@@ -352,6 +371,12 @@ export class StartComponent implements OnInit {
     const FaceDetails = RekognizedDataBody[1];
     const CelebrityFaces = RekognizedDataBody[2];
     const FaceMatches = RekognizedDataBody[3];
+
+    this.LabelsToDisplay = Labels;
+    this.FaceDetailsToDisplay = FaceDetails;
+    this.CelebrityDataToDisplay = CelebrityFaces;
+    this.FaceMatchesToDisplay = FaceMatches;
+
 
     const genderSelfLc = JSON.parse(this.dataService.fymCriteriaSet).genderSelf;
     const genderSelf = this.toTitleCase(genderSelfLc);
@@ -445,7 +470,8 @@ export class StartComponent implements OnInit {
           } else { who = ', this person looks '; }
         }
         console.log('who = ', who);
-        const celebrities = isCelebrityConf > 50 ? wow + who + howMuchAlike + ' like ' + isCelebrity + '. ' : '';
+        const celebrities = isCelebrityConf > 50 ? wow + who + howMuchAlike + ' like '
+        + isCelebrity + '. I am also fan of this person.' : '';
         newText = this.add(celebrities, newText);
 
         if (celebrities.length > 0 && this.stepAtFunctionStart === 2) {
@@ -460,7 +486,7 @@ export class StartComponent implements OnInit {
             if (x === 0) { celebrities = CelebrityFaces[x].Name; } else { celebrities = celebrities + ', ' + CelebrityFaces[x].Names; }
           } else { celebrities = celebrities + ' and ' + CelebrityFaces[x].Name; }
         }
-        newText = this.add(' These people look like ' + celebrities + '.', newText);
+        newText = this.add(' These people look like ' + celebrities + '. I am their fan, too.', newText);
         if (celebrities.length > 0 && this.stepAtFunctionStart === 2) {
           this.currentStep = 3;
         } else if (this.stepAtFunctionStart === 2 && celebrities.length === 0) { repeatStepTwo = true; }
@@ -480,11 +506,11 @@ export class StartComponent implements OnInit {
             const isSmiling = FaceDetails[0].Smile != null ? FaceDetails[0].Smile.Value : false;
             if (isSmiling) { iLikes.push('smile'); }
             const isBeard = FaceDetails[0].Beard != null ? FaceDetails[0].Beard.Value : false;
-            if (isBeard) { iLikes.push('beard'); }
+            if (Gender === 'Male' && isBeard) { iLikes.push('beard'); }
             if (Gender === 'Male' && !isBeard) { iGlads.push('beard'); }
             // Removed. Rekognition makes many errors saying there is no moustache when there is a solid one.
             // const isMoustach = FaceDetails[0].Mustache != null ? FaceDetails[0].Mustache.Value : false;
-            // if (isMoustach) { iLikes.push('moustach'); }
+            // if (Gender === 'Male' && isMoustach) { iLikes.push('moustach'); }
             // if (Gender === 'Male' && !isMoustach) { iGlads.push('moustach'); }
             const isSunGlass = FaceDetails[0].Sunglasses != null ? FaceDetails[0].Sunglasses.Value : false;
             const isEyeGlass = FaceDetails[0].Eyeglasses != null ? FaceDetails[0].Eyeglasses.Value : false;
@@ -555,8 +581,18 @@ export class StartComponent implements OnInit {
       });
       if (items.length > 0) {
         const Text1 = this.makeCommaAndText(items);
+        let firstName = JSON.parse(this.dataService.fymCriteriaSet).firstName;
+        firstName = this.toTitleCase(firstName);
+        if (FaceMatches.length > 0) {
+          if (FaceMatches[0].Similarity > 70) {
+            newText = newText + ' I think I recognize you in this last image. Great, ';
+          }
+        }
+        if (FaceMatches.length === 0) {
+          newText = newText + ' Ok, I do not see you in this last image, but still, ';
+        }
         // tslint:disable-next-line:max-line-length
-        newText = newText + ' Ok, I am glad that you have some spare time activity. I can see here ' + Text1 + '. I like all this. Whoops, I may be late to get something important done. I would like to keep in touch with you. Talk to you soon !';
+        newText = newText + ' I am glad that you have some spare time activity. I can see here ' + Text1 + '. I like all this. Whoops, I have something urgent to do now. I would like to keep in touch with you. Talk to you soon ' + firstName + ' !';
         this.currentStep = 5;
         this.stepAtFunctionStart = 5;
       } else { repeatStepFour = true; }
@@ -625,5 +661,9 @@ export class StartComponent implements OnInit {
 
   canShowAge() {
     this.showAge = true;
+  }
+
+  goHome() {
+    this.router.navigate(['/home']);
   }
 }

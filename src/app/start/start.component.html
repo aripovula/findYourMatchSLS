@@ -1,209 +1,210 @@
 <div>
   <div id="container" class="margintop">
     <div id="left">
-      <div class="scrollDiv boxed">
-        <div style="font-size: 14px;">
-          <!-- try to -->
-          <!-- send same gender photos -->
-          <!-- items when asked for your photo -->
-          <!-- send animal faces -->
+      <div class="scrollDiv boxedUpperLeft">
+
+        <div *ngIf="currentStep == 1 || currentStep == 5" style="font-size: 14px;">
+          <span>Things you can try to check how it works:</span>
+          <br/>
+          <br/>
+          <span>In response to first question ( asking you to send your photo ) :</span>
+          <br/>
+          <span>- send same gender photos</span>
+          <br/>
+          <span>- send photos with more than 2 human faces</span>
+          <br/>
+          <span>- send photos with 2 human faces of SAME genders</span>
+          <br/>
+          <span>- send photos with 2 human faces of DIFFERENT genders</span>
+          <br/>
+          <span>- send photos with no human faces</span>
+          <br/>
+          <br/>
+          <span>Try to do all this saying that you have opposite gender and looking for person of same gender as yours. </span>
+          <br/>
+          <br/>
+          <span>In response to second question ( asking you to send celebrity photo ) :</span>
+          <br/>
+          <span>- send photos with no celebrities</span>
+          <br/>
+          <span>- send photos with no human faces</span>
+          <br/>
+          <br/>
+          <span>In response to third question ( asking you to send animal photos ) :</span>
+          <br/>
+          <span>- send photos with no animals</span>
+          <br/>
+          <br/>
+          <span>Also try to type names and nicknames other than the pre-filled ones.</span>
+        </div>
+        <div *ngIf="currentStep == 2" style="font-size: 14px;">
+          <span>Face recognition process: ( except that instead of saving result to DynamoDB my Lambda returns directly to browser )
+          </span>
+          <br/>
+          <!-- image source: https://aws.amazon.com/blogs/machine-learning/build-your-own-face-recognition-service-using-amazon-rekognition/ -->
+          <img src="../../assets/face_recognition.png" width="96%;">
+        </div>
+
+        <div *ngIf="currentStep == 3" style="font-size: 14px;">
           <p>Audio is generated using Amazon Polly - voices: Salli (F), Matthew (M).</p>
           <div *ngIf="matchPersonData">
             <p>Current message mp3 file url: {{conversation[conversationStep].audio}}</p>
           </div>
-          <p>The Lambda function (using AWS Rekognition &larr; spelled correctly - as by AWS) :</p>
-          <div style="margin-left: 40px;">
-            <p>1. Checks if there is any face and if any face is detected it:</p>
-            <p> &nbsp; a) checks if it is a celebrity person</p>
-            <p> &nbsp; b) describes the face</p>
-            <p> &nbsp; c) checks if the same face is detected in any of the images</p>
-            <p>2. Describes other objects detected, if any</p>
-            <p>3. Immediately discards any uploaded file as its last step</p>
-          </div>
-          <div>
-            <p>Image upload options:</p>
-            Option 1.
-            <button class="button button1" (click)="onWebsiteUrlClicked();">Add website image URL</button>
-            <br/> Option 2.
-            <button class="button button1" (click)="onSnapshotClicked();">Take a webcam photo</button>
-            <br/>
-            <div *ngIf="uploaderHidden">
-              <br/> Option 3.
-              <span class="noDecor" (click)="onImageChangeRequest()">
-                <span *ngIf="imageFile.length != 0">
-                  Image from local file system received - click here to change the image
-                </span>
-                <span *ngIf="imageFile.length == 0">
-                  Add image
-                </span>
+          <br/>
+          <span>Below response (in JSON format) is all I get from AWS Rekognition. All the code that does actual analysis and generates response is
+            written by me :
+            <br/><br/> Labels:
+            <pre>{{LabelsToDisplay | json}}</pre>
+            <br/> Face Details:
+            <pre>{{FaceDetailsToDisplay | json}}</pre>
+            <br/> Celebrity Data:
+            <pre>{{CelebrityDataToDisplay | json}}</pre>
+            <br/> Face Matches:
+            <pre>{{FaceMatchesToDisplay | json}}</pre>
+          </span>
+        </div>
+        <div *ngIf="currentStep == 4" style="font-size: 14px;">
+          <span>Audio file producing process: ( except that instead of SNS I used SQS ) </span>
+          <br/>
+          <img src="../../assets/pollyProcess.png" width="80%;">
+        </div>
+      </div>
+      <div class="scrollDiv boxedBottomLeft">
+        <div>
+          <span style="font-size: 14px;">You can use button below to upload image &darr; or use text input field to add image URL or use button to capture
+            image from web-cam &rarr;</span>
+          <div *ngIf="uploaderHidden">
+            <span class="noDecor" (click)="onImageChangeRequest()">
+              <span *ngIf="imageFile.length != 0">
+                Image from local file system received - click here to change the image
               </span>
-              <span class="verIndent"></span>
-            </div>
-            <div *ngIf="!uploaderHidden">
-              Option 3:
-              <image-upload class="imageUpload" buttonCaption="Upload image" dropBoxMessage="OR drop image here" [max]="1" [extensions]="['jpg','jpeg','png','gif']"
-                [maxFileSize]="1048576" (uploadFinished)="onUploadFinished($event)" (uploadStateChanged)="onUploadStateChanged($event)">
-              </image-upload>
-            </div>
-
+              <span *ngIf="imageFile.length == 0">
+                Add image
+              </span>
+            </span>
+            <span class="verIndent"></span>
           </div>
-
-          <div *ngIf="isWebsiteURLchosen">
-            <form>
-              <div id="myModal" class="modal">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <span class="close" (click)="onWebsiteURLClose()">&times;</span>
-                    <p>Image URL in another website</p>
-                  </div>
-                  <div class="modal-body">
-                    <br/>
-                    <span>Image URL: &nbsp;</span>
-                    <input type="text" id="webURL" name="webURL" [(ngModel)]="webURL" autofocus>
-                    <!-- <span>(ngModelChange)="onWebURLChange()"</span> -->
-                    <br/>
-                    <br/>
-                    <p style="font-size: 14px;">Please right click on an image and use 'Copy image address' and NOT 'Copy link address'</p>
-                    <p style="font-size: 14px;">( image is downloaded directly by
-                      <span style="color:dodgerblue">AWS Lambda</span>. Your browser sends URL only )</p>
-                    <br/>
-                    <button type="button" class="button button1" (click)="onWebsiteURLSubmit()">Submit</button>
-                    <button type="button" class="button button1" (click)="onWebsiteURLClose()">Close</button>
-                    <p style="font-size: 14px;">Select images from any legal website OR click one of links below - opens up in a NEW window</p>
-                    <div style="margin-left: 40px;">
-                      <a class="noDecor" href="https://www.usmagazine.com/celebrity-pictures/" target="_blank">celebrities - www.usmagazine.com</a>
-                      <br/>
-                      <a class="noDecor" href="https://www.glamour.com/entertainment" target="_blank">celebrities - www.glamour.com</a>
-                      <br/>
-                      <a class="noDecor" href="https://pixabay.com/en/photos/portrait%20face/?" target="_blank">portrait - https://pixabay.com</a>
-                      <br/>
-                      <a class="noDecor" href="https://www.freeimages.com/search/portrait" target="_blank">portrait - www.freeimages.com</a>
-                      <br/>
-                      <a class="noDecor" href="https://pixabay.com/en/photos/hobby/?" target="_blank">hobby - https://pixabay.com</a>
-                      <br/>
-                      <a class="noDecor" href="https://www.freeimages.com/search/hobby" target="_blank">hobby - www.freeimages.com</a>
-                      <br/>
-                      <a class="noDecor" href="https://pixabay.com/en/photos/sports/?" target="_blank">sports - https://pixabay.com</a>
-                      <br/>
-                      <a class="noDecor" href="https://www.freeimages.com/search/sports" target="_blank">sports - https://www.freeimages.com</a>
-                    </div>
-                    <br/>
-                    <br/>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-
-          <div *ngIf="isPopUpImageClicked">
-            <form>
-              <div id="myModal" class="modal">
-                <div class="modal-content">
-                  <div style="text-align:center">
-                    <div class="modal-header">
-                      <span class="close" (click)="onPopUpImageClose()">&times;</span>
-                      <p>Photo view</p>
-                    </div>
-                    <div class="modal-body">
-                      <br/>
-                      <img class='img-responsive' src={{popUpImage}}>
-                      <br/>
-                      <button type="button" class="button button1" (click)="onPopUpImageClose()">Close</button>
-                    </div>
-                    <br/>
-                    <br/>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-
-          <div>
-            <div *ngIf="isCapturePhotoChosen">
-              <form>
-                <div id="myModal" class="modal">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <span class="close" (click)="onCapturePhotoModalClose()">&times;</span>
-                      <p>Capture photo mode</p>
-                    </div>
-                    <div class="modal-body">
-                      <div style="text-align:center">
-                        <div *ngIf="!isPhotoCaptured">
-                          <webcam [height]="400" [width]="400" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
-                            [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions"
-                            (initError)="handleInitError($event)">
-                          </webcam>
-                          <br/>
-                          <button class="button button1" (click)="triggerSnapshot();">Take A Snapshot</button>
-                          <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Close</button>
-                          <br/>
-                          <br/>
-                          <p style="font-size: 12px;">* Not supported in Safari. Tested in Google Chrome.</p>
-                        </div>
-
-                        <div *ngIf="isPhotoCaptured">
-                          <div class="snapshot" *ngIf="webcamImage">
-                            <img height="400px" [src]="webcamImage.imageAsDataUrl" />
-                          </div>
-                          <br/>
-                          <button type="button" class="button button1" (click)="onImageCaptureSubmitted()">Submit</button>
-                          <button class="button button1" (click)="onCaptureAgainClicked();">Take A New Snapshot</button>
-                          <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Cancel</button>
-                          <br/>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-                  <br/>
-                  <br/>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <div style="font-size: 16px">
-            <div *ngIf="isNotValidImage">
-              <form>
-                <div id="myModal" class="modal">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <span class="close" (click)="onNotValidImageClose()">&times;</span>
-                      <p>Image not received</p>
-                    </div>
-                    <div class="modal-body">
-                      <div style="text-align:left">
-                        <div *ngIf="isNotValidURLprovided">
-                          <br/>
-                          <p>Image URL is not valid !</p>
-                          <p>Please right click on an image and use 'Copy image address' and NOT 'Copy link address'</p>
-                          <img src="../../assets/copyURL.png" width="40%;">
-                        </div>
-                        <div *ngIf="isNotValidImageProvided">
-                          <br/>
-                          <p>Image file is not valid !</p>
-                          <p>Please make sure that uploaded file is of 'jpeg', 'png' or 'gif' types.</p>
-                        </div>
-                        <br/>
-                        <button type="button" class="button button1" (click)="onNotValidImageClose()">OK</button>
-                        <br/>
-                        <br/>
-                      </div>
-
-                    </div>
-                  </div>
-                  <br/>
-                  <br/>
-                </div>
-              </form>
-            </div>
+          <div *ngIf="!uploaderHidden">
+            <image-upload class="imageUpload" buttonCaption="Upload image" dropBoxMessage="OR drop image here" [max]="1" [extensions]="['jpg','jpeg','png','gif']"
+              [maxFileSize]="1048576" (uploadFinished)="onUploadFinished($event)" (uploadStateChanged)="onUploadStateChanged($event)">
+            </image-upload>
           </div>
         </div>
       </div>
     </div>
+
+    <div *ngIf="isPopUpImageClicked">
+      <form>
+        <div id="myModal" class="modal">
+          <div class="modal-content">
+            <div style="text-align:center">
+              <div class="modal-header">
+                <span class="close" (click)="onPopUpImageClose()">&times;</span>
+                <p>Photo view</p>
+              </div>
+              <div class="modal-body">
+                <br/>
+                <img class='img-responsive' src={{popUpImage}}>
+                <br/>
+                <button type="button" class="button button1" (click)="onPopUpImageClose()">Close</button>
+              </div>
+              <br/>
+              <br/>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div>
+      <div *ngIf="isCapturePhotoChosen">
+        <form>
+          <div id="myModal" class="modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <span class="close" (click)="onCapturePhotoModalClose()">&times;</span>
+                <p>Capture photo mode</p>
+              </div>
+              <div class="modal-body">
+                <div style="text-align:center">
+                  <div *ngIf="!isPhotoCaptured">
+                    <webcam [height]="400" [width]="400" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
+                      [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions"
+                      (initError)="handleInitError($event)">
+                    </webcam>
+                    <br/>
+                    <button class="button button1" (click)="triggerSnapshot();">Take A Snapshot</button>
+                    <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Close</button>
+                    <br/>
+                    <br/>
+                    <p style="font-size: 12px;">* Not supported in Safari. Tested in Google Chrome.</p>
+                  </div>
+
+                  <div *ngIf="isPhotoCaptured">
+                    <div class="snapshot" *ngIf="webcamImage">
+                      <img height="400px" [src]="webcamImage.imageAsDataUrl" />
+                    </div>
+                    <br/>
+                    <button type="button" class="button button1" (click)="onImageCaptureSubmitted()">Submit</button>
+                    <button class="button button1" (click)="onCaptureAgainClicked();">Take A New Snapshot</button>
+                    <button type="button" class="button button1" (click)="onCapturePhotoModalClose()">Cancel</button>
+                    <br/>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <br/>
+            <br/>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div style="font-size: 16px">
+      <div *ngIf="isNotValidImage">
+        <form>
+          <div id="myModal" class="modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <span class="close" (click)="onNotValidImageClose()">&times;</span>
+                <p>Image not received</p>
+              </div>
+              <div class="modal-body">
+                <div style="text-align:left">
+                  <div *ngIf="isNotValidURLprovided">
+                    <br/>
+                    <p>Image URL is not valid !</p>
+                    <p>Please right click on an image and use 'Copy image address' and NOT 'Copy link address'.</p>
+                    <p>Pasted URL is
+                      <span style="color:brown">auto-submitted</span> when valid image URL is recognized.</p>
+                    <img src="../../assets/copyURL.png" width="30%;">
+                    <p style="font-size: 14px;">Image is
+                      <span style="color:brown">downloaded directly by</span> AWS Lambda. Your browser sends URL only.</p>
+                  </div>
+                  <div *ngIf="isNotValidImageProvided">
+                    <br/>
+                    <p>Image file is not valid !</p>
+                    <p>Please make sure that uploaded file is of 'jpeg', 'png' or 'gif' types.</p>
+
+                  </div>
+                  <br/>
+                  <button type="button" class="button button1" (click)="onNotValidImageClose()">OK</button>
+                  <br/>
+                </div>
+
+              </div>
+            </div>
+            <br/>
+            <br/>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
     <div id="right">
-      <div class="scrollDiv boxedUpper" style="overflow: scroll; height: xyz;" #scrollMe [scrollTop]="scrollMe.scrollHeight">
+      <div class="scrollDiv boxedUpper" #scrollMe [scrollTop]="scrollMe.scrollHeight">
         <div *ngIf="!matchPersonData">
           <p>( to start relations please first find your match )</p>
         </div>
@@ -283,11 +284,16 @@
       </div>
       <div class="boxedBottom">
         <div>
-          <div *ngIf="stepAtFunctionStart < 5">
-            <button style="float: right; height: 36px;" class="buttonMessage" (click)="onWebsiteUrlClicked();"> &nbsp; &nbsp; &nbsp; Send &nbsp; &nbsp; &nbsp;</button>
+          <div *ngIf="stepAtFunctionStart < 5" class="container22">
+            <input type="text" id="webURL" name="webURL" style="display:table-cell; width:100%" placeholder="Image URL ONLY" [(ngModel)]="webURL"
+              (ngModelChange)="onImageURLchange($event)" #myInput2> {{ myInput2.focus() }}
+            <button style="height: 36px;" class="buttonMessage" (click)="onWebsiteURLSubmit();"> Send </button>
+            <button style="width: 8%; height: 36px;" class="buttonMessage" (click)="onSnapshotClicked();">
+              <img src="../../assets/camera.png" width="100%;">
+            </button>
           </div>
           <div *ngIf="stepAtFunctionStart == 5">
-            <button style="float: right; height: 36px;" class="buttonMessage" (click)="onRestartClicked();"> &nbsp; &nbsp; &nbsp; Restart &nbsp; &nbsp; &nbsp;</button>
+            <button style="float: right; height: 36px;" class="buttonMessage" (click)="goHome();"> &nbsp; &nbsp; &nbsp; Restart &nbsp; &nbsp; &nbsp;</button>
           </div>
         </div>
         <div *ngIf="stepAtFunctionStart == 5">
@@ -296,23 +302,38 @@
           </div>
         </div>
       </div>
-      <div id="atBottom2" *ngIf="matchPersonData && !conversation[conversationStep].isSelf && stepAtFunctionStart == 1">
-        <span class="verIndent"></span>
-        <span style="color: brown; size: 20px;" *ngIf="!imageToSend">
-          <span style="margin-left: 20px;">Please add "your" photo ( OR add photo of a celebrity ! )</span>
-          <br/>
-          <span style="margin-left: 20px;">For this please use one of buttons on the left panel.</span>
-        </span>
+      <div style="color: green; size: 16px;margin-left: 20px" *ngIf="currentStep == 1">
+        You can send images only. Please send 'your' photo using one of action buttons. You can use these links ( opens up in new
+        tab ) or any other source:
+        <br/>
+        <a class="addnlightbg" target="_blank" href="https://www.pexels.com/search/portrait/"> - male and female portraits - from pexels.com</a>
+        <br/>
+        <a class="addnlightbg" target="_blank" href="https://pixabay.com/en/photos/portrait/"> - male and female portraits - from pixabay.com</a>
       </div>
-      <div id="atBottom2" *ngIf="matchPersonData && !conversation[conversationStep].isSelf && stepAtFunctionStart == 2">
-        <span class="verIndent"></span>
-        <span style="color: brown; size: 20px;" *ngIf="!imageToSend">
-          <span style="margin-left: 20px;">Please add photo of a celebrity person ! )</span>
-          <br/>
-          <span style="margin-left: 20px;">For this please use one of buttons on the left panel.</span>
-        </span>
+      <div style="color: green; size: 16px;margin-left: 20px" *ngIf="currentStep == 2">
+        You can send images only. Please send photo of celebrities using one of action buttons. You can use these links ( opens up
+        in new tab ) or any other source:
+        <br/>
+        <a class="addnlightbg" target="_blank" href="https://www.usmagazine.com/celebrity-pictures/"> - celebrities - from usmagazine.com</a>
+        <br/>
+        <a class="addnlightbg" target="_blank" href="https://www.glamour.com/entertainment"> - celebrities - from glamour.com</a>
       </div>
-      <!-- Labels: {{RekognizedData.body.Labels}} -->
+      <div style="color: green; size: 16px;margin-left: 20px" *ngIf="currentStep == 3">
+        You can use these links ( opens up in new tab ) or any other source:
+        <br/>
+        <a class="addnlightbg" target="_blank" href="https://www.pexels.com/search/animals/"> - animals - from pexels.com</a>
+        <br/>
+        <a class="addnlightbg" target="_blank" href="https://pixabay.com/en/photos/animals/"> - animals - from pixabay.com</a>
+      </div>
+      <div style="color: green; size: 16px;margin-left: 20px" *ngIf="currentStep == 4">
+        You can use these links ( opens up in new tab ) or any other source:
+        <br/>
+        <a class="addnlightbg" target="_blank" href="https://www.pexels.com/search/sports/"> - sports - from pexels.com</a> &nbsp; &nbsp; &nbsp; &nbsp;
+        <a class="addnlightbg" target="_blank" href="https://www.pexels.com/search/hobbies/"> - hobbies - from pexels.com</a>
+        <br/>
+        <a class="addnlightbg" target="_blank" href="https://pixabay.com/en/photos/sport/"> - sports - from pixabay.com</a> &nbsp; &nbsp; &nbsp; &nbsp;
+        <a class="addnlightbg" target="_blank" href="https://pixabay.com/en/photos/hobbies/"> - hobbies - from pixabay.com</a>
+      </div>
     </div>
   </div>
 </div>

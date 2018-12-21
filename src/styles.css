@@ -81,7 +81,7 @@ body, html {
 
 .boxedUpper {
   width: 92%;
-  height: calc(100vh - 250px);
+  height: calc(100vh - 280px);
   padding: 15px;
   margin: 5px;
   margin-left: 2%;
@@ -102,6 +102,31 @@ body, html {
   border: green solid 2px;
   border-radius: 2px;
 }
+
+.boxedUpperLeft {
+  width: 92%;
+  height: calc(100vh - 310px);
+  padding: 15px;
+  margin: 5px;
+  margin-left: 2%;
+  color: green;
+  text-align: left;
+  border: green solid 2px;
+  border-radius: 2px;
+}
+
+.boxedBottomLeft {
+  width: 92%;
+  height: 160px;
+  padding: 15px;
+  margin: 5px;
+  margin-left: 2%;
+  color: green;
+  text-align: left;
+  border: green solid 2px;
+  border-radius: 2px;
+}
+
 
 .bold {
   font-weight: bold;
@@ -543,6 +568,14 @@ select {
   padding: 15px;
   margin-right: 14px;
 }
+
+.container22 {
+  display: flex;
+  align-items: center;
+}
+
+
+
 
 /* MODAL */
 
