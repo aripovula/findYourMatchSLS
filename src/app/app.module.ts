@@ -20,12 +20,14 @@ import { AuthGuard } from './services/auth-guard.service';
 import { HomeComponent } from './home/home.component';
 import { StartComponent } from './start/start.component';
 import { ProfileComponent } from './profile/profile.component';
+import { SourceComponent } from './source/source.component';
 
 const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'start', component: StartComponent, canActivate: [AuthGuard] },
   { path: 'all_users_admin_only', component: AllUsersComponent, canActivate: [AuthGuard] },
+  { path: 'source', component: SourceComponent, canActivate: [AuthGuard] },
 
   { path: 'not-found', component: NotFoundComponent },
   { path: '**', redirectTo: '/not-found' }
@@ -42,6 +44,7 @@ const appRoutes: Routes = [
     HomeComponent,
     StartComponent,
     ProfileComponent,
+    SourceComponent,
   ],
   imports: [
     BrowserModule,

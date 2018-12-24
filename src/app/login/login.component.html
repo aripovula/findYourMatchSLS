@@ -9,7 +9,7 @@
       <!-- image source: https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-sign-up.html -->
       <img src="../../assets/lambda-pre-sign-up.png" height="160px;">
     </span>
-    <span>&lt; -- uses 'pre-sign up' lambda *</span>
+    <span>&larr; uses 'pre-sign up' lambda *</span>
     <br/>
     <br/>
     <div style="background-color: rgb(229, 244, 245);">
@@ -54,6 +54,7 @@
             <label>
               <input type="radio" name='user' value='new' formControlName="user" (ngModelChange)="onUserChange()"> sign in as a new user (type any user name above. Changing standard password is optional)</label>
           </div>
+          <br/>
           <span style="font-size: 12px; margin-left: 110px;">* by default Cognito requires sign-up verification. Pre sign-up lambda eliminates this need in this demo version</span>
           <br/>
           <br/>

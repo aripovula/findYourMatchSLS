@@ -249,10 +249,10 @@
                   <div style="text-align:left; font-size: 14px;margin-left:20px;">
                     <span>1) API Gateway + Cognito &harr; </span><br/>
                     <span>2a) AWS Lambda (#1) &harr; DynamoDB ( Global Secondary Index is used ) &rarr; returns Match data</span><br/>
-                    <span>2b) AWS Lambda (#1) &rarr; Step Functions &rarr; two parallel AWS Lambda functions (#2, #4, see chart below)</span><br/>
+                    <span>2b) AWS Lambda (#1) &rarr; Step Functions &rarr; two parallel branches both ending with an AWS Lambda functions (#2, #4, see chart below)</span><br/>
                     <span>2b.1) AWS Lambda (#2) &rarr; SQS &rarr; AWS Lambda (#3, generates Polly mp3 file) &rarr; S3 (*.mp3 file), DynamoDB (S3 *.mp3 file name, readiness status)</span><br/>
-                    <span>2b.2) AWS Lambda (#4) &rarr; enables CloudWatch rule to delete S3 files and DynamoDB data older than past 20 minutes.</span><br/>
-                    <img src="../../assets/modalImage.png" width="60%;">
+                    <span>2b.2) second Step branch starts process of deleting S3 files and DynamoDB data. Wait step waits 20 minutes and then AWS Lambda (#4) deletes due files/records.</span><br/>
+                    <img src="../../assets/stepChart.png" width="100%;">
                   </div>
                 </div>
               </div>

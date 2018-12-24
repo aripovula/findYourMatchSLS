@@ -70,7 +70,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   onSourceClicked() {
     console.log('in onSourceClicked');
-    window.open('https://github.com/aripovula/findYourMatchSLS', '_blank');
+    this.router.navigate(['/source']);
+    // window.open('https://github.com/aripovula/findYourMatchSLS', '_blank');
   }
 
   onLogoutClicked() {

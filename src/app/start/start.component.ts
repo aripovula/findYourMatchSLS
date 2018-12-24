@@ -36,7 +36,6 @@ export class StartComponent implements OnInit {
   isNotValidImage = false;
   isNotValidURLprovided = false;
   isNotValidImageProvided = false;
-
   showWebcam = true;
   allowCameraSwitch = true;
   multipleWebcamsAvailable = false;
@@ -61,19 +60,25 @@ export class StartComponent implements OnInit {
   // forUseRekognition
   currentStep = 1;
   stepAtFunctionStart = 1;
+  notSeriousCount = 0;
 
 
   constructor(private dataService: DataService, private router: Router) {
-    this.onGetAudio1Clicked('0');
+    // start only if a matched person is found
     this.matchPersonData = this.dataService.fymResponseData;
+    if (this.matchPersonData != null) {
+      this.onGetAudio1Clicked('0');
+    }
     console.log('matchPersonData = ', this.matchPersonData);
   }
 
   ngOnInit(): void {
+    // setup web-cams
     WebcamUtil.getAvailableVideoInputs()
       .then((mediaDevices: MediaDeviceInfo[]) => {
         this.multipleWebcamsAvailable = mediaDevices && mediaDevices.length > 1;
       });
+    // start only if a matched person is found
     if (this.matchPersonData != null) {
       this.conversation[this.conversationStep] = {
         step: this.conversationStep,
@@ -112,9 +117,9 @@ export class StartComponent implements OnInit {
   }
 
   onImageCaptureSubmitted() {
-    this.dataService.postImage(this.webcamImage).then(() => {
-      this.dataService.getInfoOnURLImage('2', '1', null);
-    });
+    this.isURLorImageFileValid(this.webcamImage.imageAsDataUrl, 2, this);
+    console.log('this.webcamImage = ', this.webcamImage);
+
     this.isCapturePhotoChosen = false;
     this.isPhotoCaptured = false;
     this.imageToSend = this.webcamImage.imageAsDataUrl;
@@ -141,21 +146,6 @@ export class StartComponent implements OnInit {
     return this.nextWebcam.asObservable();
   }
 
-  // public toggleWebcam(): void {
-  //   this.showWebcam = !this.showWebcam;
-  // }
-
-  // public showNextWebcam(directionOrDeviceId: boolean | string): void {
-  //   // true => move forward through devices
-  //   // false => move backwards through devices
-  //   // string => move to device with given deviceId
-  //   this.nextWebcam.next(directionOrDeviceId);
-  // }
-
-  // public cameraWasSwitched(deviceId: string): void {
-  //   console.log('active device: ' + deviceId);
-  //   this.deviceId = deviceId;
-  // }
 
   // on add image URL
   onWebsiteUrlClicked() {
@@ -208,13 +198,14 @@ export class StartComponent implements OnInit {
     this.isNotValidImageProvided = false;
   }
 
+  // check validity of image of whatever format and if valid send to applicable get/post image API endpoint
   isURLorImageFileValid(URLorFileSrc, type: number, that) {
     const img = new Image();
     this.showAge = false;
     img.onload = () => {
       that.onImageSend();
       if (type === 1) {
-        that.dataService.getInfoOnURLImage('1', this.dataService.fymRequestID, URLorFileSrc)
+        that.dataService.getInfoOnURLImage('1', this.dataService.fymRequestID, '' + this.currentStep, URLorFileSrc)
           .then((data) => {
             that.useRekognizedData(data);
           })
@@ -227,18 +218,18 @@ export class StartComponent implements OnInit {
               name: null,
               image: null,
               audio: null,
-              text: 'Hey, I can not recognize anything in that photo! Can you send another one please !'
+              text: 'Hey, something is wrong ! My computer does not work as expected !'
             };
             this.onNewMessage();
           });
       } else if (type === 2) {
-        that.dataService.postImage({ _imageAsDataUrl: URLorFileSrc }).then(() => {
-          that.dataService.getInfoOnURLImage('2', this.dataService.fymRequestID, 'none')
-            .then((data) => {
-              // that.RekognizedData = data;
-              that.useRekognizedData(data);
-            });
-        });
+        that.dataService.postImage({ _imageAsDataUrl: URLorFileSrc }, '' + that.currentStep)
+          .then(() => {
+            that.dataService.getInfoOnURLImage('2', this.dataService.fymRequestID, '' + this.currentStep, 'none')
+              .then((data) => {
+                that.useRekognizedData(data);
+              });
+          });
       }
     };
     img.onerror = function () {
@@ -253,6 +244,25 @@ export class StartComponent implements OnInit {
     img.src = URLorFileSrc;
   }
 
+  // as soon as Rekognition data is analysed and message text is ready
+  // this function is called from function analysing Rekognition data
+  onRequestAudioSynth(text) {
+    const params = JSON.stringify({
+      gender: JSON.parse(this.dataService.fymCriteriaSet).genderFind,
+      text
+    });
+    const seqNumb = this.conversationStep + 1;
+    this.dataService.getAudio('addNew', '' + seqNumb, params)
+      .then((data) => {
+        console.log('after onRequestAudioSynth = ', data);
+        console.log('in onRequestAudioSynth seqNumb = ', seqNumb);
+        this.onGetAudio1Clicked('' + seqNumb);
+      });
+  }
+
+  // as soon as onRequestAudioSynth(text) call (function above) is successful
+  // this function checks if audio file is ready and if not checks every 2 secs.
+  // When Ready status is returned new message sound is played and new message is displayed
   onGetAudio1Clicked(mp3SeqNumb: string) {
     this.dataService.getAudio('check', mp3SeqNumb, 'none')
       .then((fromDB: any) => {
@@ -279,20 +289,7 @@ export class StartComponent implements OnInit {
       ;
   }
 
-  onRequestAudioSynth(text) {
-    const params = JSON.stringify({
-      gender: JSON.parse(this.dataService.fymCriteriaSet).genderFind,
-      text
-    });
-    const seqNumb = this.conversationStep + 1;
-    this.dataService.getAudio('addNew', '' + seqNumb, params)
-      .then((data) => {
-        console.log('after onRequestAudioSynth = ', data);
-        console.log('in onRequestAudioSynth seqNumb = ', seqNumb);
-        this.onGetAudio1Clicked('' + seqNumb);
-      });
-  }
-
+  // this add new message to conversation array
   addNewMessage(data) {
     console.log('in addNewMessage data =', data);
     this.conversationStep++;
@@ -309,6 +306,7 @@ export class StartComponent implements OnInit {
     console.log('this.conversation[this.conversationStep] = ', this.conversation[this.conversationStep]);
   }
 
+  // this is called when user clicks 'play audio' button
   onPlayAudioClicked(url) {
     new Audio(url).play();
   }
@@ -326,6 +324,7 @@ export class StartComponent implements OnInit {
     );
   }
 
+  // when image sending is successful it adds next message details
   onImageSend() {
     this.conversationStep++;
     this.conversation[this.conversationStep] = {
@@ -339,6 +338,7 @@ export class StartComponent implements OnInit {
     this.imageToSend = null;
   }
 
+  // when user click link of sent image
   onPopUpImageClicked(step) {
     this.popUpImage = this.conversation[step].image;
     this.isPopUpImageClicked = true;
@@ -349,6 +349,7 @@ export class StartComponent implements OnInit {
     this.popUpImage = null;
   }
 
+  // main largest function that does analysis and response generation based on Rekognition data
   useRekognizedData(RekognizedData) {
     const RekognizedDataBody = JSON.parse(RekognizedData.body);
     let newText = '';
@@ -385,6 +386,7 @@ export class StartComponent implements OnInit {
     console.log('FaceDetails.length=', FaceDetails.length);
     console.log('genderSelf + Gender=', genderSelf, Gender);
 
+    // these validate validity of images sent
     if (this.stepAtFunctionStart === 1) {
       if (FaceDetails == null && this.stepAtFunctionStart === 1 ||
         FaceDetails.length === 0 && this.stepAtFunctionStart === 1) {
@@ -394,13 +396,11 @@ export class StartComponent implements OnInit {
         newText = this.add('Hey, I asked for your photo only. I see ' + FaceDetails.length + ' faces here !', newText);
         repeatStepOne = true;
       } else if (FaceDetails.length === 2) {
-        console.log('in 2 faces');
         console.log('FaceDetails[0].Gender.Value = ', FaceDetails[0].Gender.Value);
         console.log('FaceDetails[1].Gender.Value = ', FaceDetails[1].Gender.Value);
         console.log('genderSelf = ', genderSelf);
 
         if (FaceDetails[0].Gender.Value === genderSelf && FaceDetails[1].Gender.Value === genderSelf) {
-          console.log('in 2 a');
           if (FaceDetails[0].AgeRange.Low >= 18 && FaceDetails[1].AgeRange.Low >= 18) {
             newText = this.add('I see two ' + genderSelfLc
               + 's here. I do not know which one is you ! ', newText);
@@ -410,17 +410,15 @@ export class StartComponent implements OnInit {
               + 's here. Since one of them looks too young I guess other one is you !', newText);
           } else {
             newText = this.add('I see two ' + genderSelfLc
-              + 's here. But both of them look too young. One of them is you ?', newText);
+              + 's here. But both of them look too young. One of them is you (in childhood) ?', newText);
             repeatStepOne = true;
           }
         } else if (!(FaceDetails[0].Gender.Value === genderSelf) && !(FaceDetails[1].Gender.Value === genderSelf)) {
-          console.log('in 2 b');
           const oppGender = genderSelf === 'Male' ? 'female' : 'male';
           newText = this.add('Hey, I asked for your photo. I see two ' + oppGender + 's here !', newText);
           repeatStepOne = true;
         } else if (FaceDetails[0].Gender.Value === genderSelf && !(FaceDetails[1].Gender.Value === genderSelf) ||
           !(FaceDetails[0].Gender.Value === genderSelf) && FaceDetails[1].Gender.Value === genderSelf) {
-          console.log('in 2 c');
           console.log('in TWO DIF GENDERS');
           if (FaceDetails[0].AgeRange.Low >= 18 && FaceDetails[1].AgeRange.Low >= 18) {
             const oppGender = genderSelf === 'Male' ? 'she' : 'he';
@@ -451,47 +449,67 @@ export class StartComponent implements OnInit {
     }
 
     if (!repeatStepOne) {
-      // this.RekognizedData;
-      console.log('in ELSE LARGE');
-      if (CelebrityFaces.length === 0 && this.stepAtFunctionStart === 2) {
-        repeatStepTwo = true;
-      } else if (CelebrityFaces.length === 1) {
-        const isCelebrity = CelebrityFaces[0].Name;
-        const isCelebrityConf = CelebrityFaces[0].MatchConfidence;
-        console.log('isCelebrity=', isCelebrity, isCelebrityConf);
-        let howMuchAlike; let wow = ''; let who = '';
-        if (isCelebrityConf > 90) { howMuchAlike = 'exactly'; wow = 'Oh my ...'; }
-        if (isCelebrityConf > 80 && isCelebrityConf <= 90) { howMuchAlike = 'almost'; wow = 'Wow'; }
-        if (isCelebrityConf > 50 && isCelebrityConf <= 80) { howMuchAlike = 'a little'; wow = 'Hey'; }
-        if (this.stepAtFunctionStart === 1) { who = ', you look '; } else {
-          if (FaceDetails != null && FaceDetails.length > 0) {
-            if (FaceDetails[0].Gender.Value === 'Male') { who = ', he looks '; }
-            if (FaceDetails[0].Gender.Value === 'Female') { who = ', she looks '; }
-          } else { who = ', this person looks '; }
-        }
-        console.log('who = ', who);
-        const celebrities = isCelebrityConf > 50 ? wow + who + howMuchAlike + ' like '
-        + isCelebrity + '. I am also fan of this person.' : '';
-        newText = this.add(celebrities, newText);
+      if (this.stepAtFunctionStart < 3) {
+        // analyze celebrity data
+        if (CelebrityFaces.length === 0 && this.stepAtFunctionStart === 2) {
+          repeatStepTwo = true;
+        } else if (CelebrityFaces.length === 1) {
+          const isCelebrity = CelebrityFaces[0].Name;
+          const isCelebrityConf = CelebrityFaces[0].MatchConfidence;
+          console.log('isCelebrity=', isCelebrity, isCelebrityConf);
+          let howMuchAlike; let wow = ''; let who = '';
+          if (isCelebrityConf > 90) { howMuchAlike = 'exactly'; wow = 'Oh my ...'; }
+          if (isCelebrityConf > 80 && isCelebrityConf <= 90) { howMuchAlike = 'almost'; wow = 'Wow'; }
+          if (isCelebrityConf > 50 && isCelebrityConf <= 80) { howMuchAlike = 'a little'; wow = 'Hey'; }
+          if (this.stepAtFunctionStart === 1) { wow = 'Cool'; who = ', you look '; } else {
+            if (FaceDetails != null && FaceDetails.length > 0) {
+              if (FaceDetails[0].Gender.Value === 'Male') { who = ', he looks '; }
+              if (FaceDetails[0].Gender.Value === 'Female') { who = ', she looks '; }
+            } else { who = ', this person looks '; }
+          }
+          console.log('who = ', who);
+          let celebrities = isCelebrityConf > 50 ? wow + who + howMuchAlike + ' like '
+            + isCelebrity + '.' : '';
+          if (this.stepAtFunctionStart === 2) {
+            celebrities = celebrities + ' I am also fan of this person.';
+          }
+          newText = this.add(celebrities, newText);
 
-        if (celebrities.length > 0 && this.stepAtFunctionStart === 2) {
-          this.currentStep = 3;
-        } else if (this.stepAtFunctionStart === 2 && celebrities.length === 0) { repeatStepTwo = true; }
+          if (celebrities.length > 0 && this.stepAtFunctionStart === 2) {
+            this.currentStep = 3; this.notSeriousCount = 0;
+          } else if (this.stepAtFunctionStart === 2 && celebrities.length === 0) { repeatStepTwo = true; }
 
-      } else if (CelebrityFaces.length > 1) {
-        console.log('in CELEBS >1');
-        let celebrities = '';
-        for (let x = 0; x < CelebrityFaces.length; x++) {
-          if (x !== CelebrityFaces.length - 1 || CelebrityFaces.length === 1) {
-            if (x === 0) { celebrities = CelebrityFaces[x].Name; } else { celebrities = celebrities + ', ' + CelebrityFaces[x].Names; }
-          } else { celebrities = celebrities + ' and ' + CelebrityFaces[x].Name; }
+          // analyze face match data
+          if (FaceMatches.length > 0 && this.stepAtFunctionStart > 1 && this.stepAtFunctionStart !== 3) {
+            if (FaceMatches[0].Similarity > 70) {
+              newText = newText + ' And this person looks very much like you. There is a lot of resemblance. ';
+            }
+          }
+
+
+        } else if (CelebrityFaces.length > 1) {
+          console.log('in CELEBS >1');
+          let celebrities = '';
+          for (let x = 0; x < CelebrityFaces.length; x++) {
+            if (x !== CelebrityFaces.length - 1 || CelebrityFaces.length === 1) {
+              if (x === 0) { celebrities = CelebrityFaces[x].Name; } else { celebrities = celebrities + ', ' + CelebrityFaces[x].Names; }
+            } else { celebrities = celebrities + ' and ' + CelebrityFaces[x].Name; }
+          }
+          newText = this.add(' These people look like ' + celebrities + '.', newText);
+          if (celebrities.length > 0 && this.stepAtFunctionStart === 2) {
+            newText = this.add(' I am their fan, too.', newText);
+            this.currentStep = 3; this.notSeriousCount = 0;
+          } else if (this.stepAtFunctionStart === 2 && celebrities.length === 0) { repeatStepTwo = true; }
+
+          if (FaceMatches.length > 0 && this.stepAtFunctionStart > 1 && this.stepAtFunctionStart !== 3) {
+            if (FaceMatches[0].Similarity > 70) {
+              newText = newText + ' One of them looks very much like you. There is a lot of resemblance. ';
+            }
+          }
         }
-        newText = this.add(' These people look like ' + celebrities + '. I am their fan, too.', newText);
-        if (celebrities.length > 0 && this.stepAtFunctionStart === 2) {
-          this.currentStep = 3;
-        } else if (this.stepAtFunctionStart === 2 && celebrities.length === 0) { repeatStepTwo = true; }
       }
 
+      // analyze face details
       if (FaceDetails != null && FaceDetails.length > 0) {
         console.log('in FACE DETAILS > 0');
 
@@ -508,23 +526,22 @@ export class StartComponent implements OnInit {
             const isBeard = FaceDetails[0].Beard != null ? FaceDetails[0].Beard.Value : false;
             if (Gender === 'Male' && isBeard) { iLikes.push('beard'); }
             if (Gender === 'Male' && !isBeard) { iGlads.push('beard'); }
-            // Removed. Rekognition makes many errors saying there is no moustache when there is a solid one.
-            // const isMoustach = FaceDetails[0].Mustache != null ? FaceDetails[0].Mustache.Value : false;
-            // if (Gender === 'Male' && isMoustach) { iLikes.push('moustach'); }
+            const isMoustach = FaceDetails[0].Mustache != null ? FaceDetails[0].Mustache.Value : false;
+            if (Gender === 'Male' && isMoustach) { iLikes.push('moustach'); }
             // if (Gender === 'Male' && !isMoustach) { iGlads.push('moustach'); }
             const isSunGlass = FaceDetails[0].Sunglasses != null ? FaceDetails[0].Sunglasses.Value : false;
             const isEyeGlass = FaceDetails[0].Eyeglasses != null ? FaceDetails[0].Eyeglasses.Value : false;
             if (isSunGlass || isEyeGlass) { iLikes.push('glasses'); }
             if (!isSunGlass && !isEyeGlass) { iGlads.push('glasses'); }
             const iLike = this.makeCommaAndText(iLikes);
-            const iGlad = this.makeCommaAndText(iGlads);
-            console.log(iLikes, iLike, iGlads, iGlad);
+            // const iGlad = this.makeCommaAndText(iGlads);
+            // console.log(iLikes, iLike, iGlads, iGlad);
 
             if (iLikes.length > 0) { newText = this.add(' I like your ' + iLike + '.', newText); }
-            if (iGlads.length > 0) { newText = this.add(' I am glad that you do NOT have ' + iGlad + '.', newText); }
+            // if (iGlads.length > 0) { newText = this.add(' I am glad that you do NOT have ' + iGlad + '.', newText); }
 
             let emotion; let conf = 0, confPrev = 0;
-            console.log('emotion = ', emotion, confPrev);
+
             FaceDetails[0].Emotions.forEach((element: any) => {
               conf = parseInt(element.Confidence, 10);
               if (confPrev < conf) {
@@ -532,38 +549,44 @@ export class StartComponent implements OnInit {
                 emotion = element.Type;
               }
             });
-            if (emotion === 'HAPPY' && confPrev > 50) { newText = this.add(' I am glad that you look happy.', newText); }
-            if (!isSmiling && emotion === 'CALM') { newText = this.add(' Hey, why you are so serious? Cheer up !', newText); }
-            if (!isSmiling && emotion !== 'CALM' && emotion !== 'HAPPY') {
+            console.log('emotion = ', emotion, confPrev);
+
+            if (emotion === 'HAPPY' && confPrev > 50) {
+              newText = this.add(' I am glad that you look happy.', newText);
+            } else if (!isSmiling && emotion === 'CALM') {
+              newText = this.add(' Hey, why you are so serious? Cheer up !', newText);
+            } else if (!isSmiling && emotion !== 'CALM' && emotion !== 'HAPPY' && confPrev > 50) {
               newText = this.add(' Hey, why you look ' + emotion.toLowerCase() + '?', newText);
             }
           }
-
         }
       }
-      if (newText.length > 0 && this.stepAtFunctionStart === 1) { this.currentStep = 2; }
+      if (newText.length > 0 && this.stepAtFunctionStart === 1) { this.currentStep = 2; this.notSeriousCount = 0; }
       if (newText.length === 0 && this.stepAtFunctionStart === 1) { repeatStepOne = true; }
     }
+
+    // check animal photo stage
     if (this.stepAtFunctionStart === 3) {
       console.log('Labels[0].toString() = ', Labels[0].toString());
-        let animalFound = false;
-        const pets = [];
-        Labels.forEach(itemPre => {
-          const item = itemPre.Name;
-          console.log('item = ', item);
-          if (item === 'Animal') { animalFound = true; }
-          if (itemPre.Confidence > 70) {
-            if (item !== 'Animal' && item !== 'Mammal' && item !== 'Pet' && item !== 'Bird' && item !== 'Person' && item !== 'Human'
-              && item !== 'Outdoors' && item !== 'Fish' && item !== 'Aquatic' && item !== 'Water' && item !== 'Rural') {
-              pets.push(item.toLowerCase());
-            }
+      let animalFound = false;
+      const pets = [];
+      Labels.forEach(itemPre => {
+        const item = itemPre.Name;
+        console.log('item = ', item);
+        if (item === 'Animal') { animalFound = true; }
+        if (itemPre.Confidence > 70) {
+          if (item !== 'Animal' && item !== 'Mammal' && item !== 'Pet' && item !== 'Bird' && item !== 'Person' && item !== 'Human'
+            && item !== 'Outdoors' && item !== 'Fish' && item !== 'Aquatic' && item !== 'Water' && item !== 'Rural') {
+            pets.push(item.toLowerCase());
           }
-        });
+        }
+      });
       if (animalFound && pets.length > 0) {
-          const Text1 = this.makeCommaAndText(pets);
-          newText = newText + ' Ok, I am glad that you like some animals. I can see here ' + Text1 + '.';
-          this.currentStep = 4;
-        } else { repeatStepThree = true; }
+        const Text1 = this.makeCommaAndText(pets);
+        newText = newText + ' Ok, I am glad that you like some animals. I can see here ' + Text1 + '.';
+        this.currentStep = 4; this.notSeriousCount = 0;
+      } else { repeatStepThree = true; }
+    // check sports / hobby image stage
     } else if (this.stepAtFunctionStart === 4) {
       console.log('Labels[0].toString() = ', Labels[0].toString());
       const items = [];
@@ -574,7 +597,7 @@ export class StartComponent implements OnInit {
           if (item !== 'Animal' && item !== 'Mammal' && item !== 'Pet' && item !== 'Bird' && item !== 'Person' && item !== 'Human'
             && item !== 'Transportation' && item !== 'Vehicle' && item !== 'Sport' && item !== 'Sports' && item !== 'Photo'
             && item !== 'Portrait' && item !== 'Photography' && item !== 'Face' && item !== '___' && item !== '___'
-          && item !== 'Outdoors' && item !== 'Fish' && item !== 'Aquatic' && item !== 'Water' && item !== 'Rural') {
+            && item !== 'Outdoors' && item !== 'Fish' && item !== 'Aquatic' && item !== 'Water' && item !== 'Rural') {
             items.push(item.toLowerCase());
           }
         }
@@ -598,7 +621,7 @@ export class StartComponent implements OnInit {
       } else { repeatStepFour = true; }
     }
 
-    // verifi
+    // next step questions
     if (this.stepAtFunctionStart === 1 && !repeatStepOne && this.currentStep === 2) {
       newText = newText + ' Can you send me photo of your favourite movie star or sports player ?';
     } else if (this.stepAtFunctionStart === 2 && !repeatStepTwo && this.currentStep === 3) {
@@ -623,23 +646,50 @@ export class StartComponent implements OnInit {
       // tslint:disable-next-line:max-line-length
       newText = newText + ' And my last question for today. In your profile you stated that you ' + Text1 + '. Can you send photo describing your ' + Text2 + '?';
     }
-    if (repeatStepOne) { newText = this.add(' Can you send me your real photo ( where you are on your own ) ?', newText); }
+
+    // REPEATs - responses when images are NOT accepted
+    console.log('this.notSeriousCount = ', this.notSeriousCount);
+    if (repeatStepOne || repeatStepTwo || repeatStepThree || repeatStepFour) {
+      if (this.notSeriousCount === 3) {
+        newText = newText + ' I am asking you for the 4th time now - ';
+      }
+    }
+    if (repeatStepOne) {
+      newText = this.add(' Can you send me your real photo ( where you are on your own ) ?', newText);
+      this.notSeriousCount++;
+    }
     if (repeatStepTwo) {
       newText
         // tslint:disable-next-line:max-line-length
         = this.add(' I do not see any celebrity person here. Or at least I do not know this person - sorry! Can you send me photo of a real celebrity ?', newText);
+      this.notSeriousCount++;
     }
-    if (repeatStepThree) { newText = this.add('  I do not see any animal here. Can you send me photo of a real animal ?', newText); }
-    if (repeatStepFour) { newText = this.add('  I do not see anything here. Can you send me photo of a real activity ?', newText); }
+    if (repeatStepThree) {
+      newText = this.add('  I do not see any animal here. Can you send me photo of a real animal ?', newText);
+      this.notSeriousCount++;
+    }
+    if (repeatStepFour) {
+      newText = this.add('  I do not see anything here. Can you send me photo of a real activity ?', newText);
+      this.notSeriousCount++;
+    }
+
+    if (this.notSeriousCount > 3) {
+      newText = this.add(' And this is the last time I am asking to send me the same thing ! ', newText);
+    }
+    if (this.notSeriousCount > 4) {
+      newText = '  Hey, I asked you one thing FIVE times !  You must be kidding ! Good luck finding someone else !';
+      this.currentStep = 5;
+      this.stepAtFunctionStart = 5;
+    }
 
     console.log('before audio synth with text = ', newText);
-    console.log('repeatOne = ', repeatStepOne);
 
-
+    // if response is not null request next audio file generation
     if (newText.length > 0) { this.onRequestAudioSynth(newText); }
 
   }
 
+  // function to facilitate text concatenation
   add(This: string, toThis: string) {
     if (toThis.length > 0) {
       toThis = toThis + This;
@@ -649,6 +699,7 @@ export class StartComponent implements OnInit {
     return toThis;
   }
 
+  // function to facilitate sentence generation with many items added up
   makeCommaAndText(array) {
     let Text1 = '';
     for (let x = 0; x < array.length; x++) {
@@ -659,10 +710,12 @@ export class StartComponent implements OnInit {
     return Text1;
   }
 
+  // called when user clicks button
   canShowAge() {
     this.showAge = true;
   }
 
+  // on restart button clicked
   goHome() {
     this.router.navigate(['/home']);
   }

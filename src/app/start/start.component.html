@@ -3,8 +3,8 @@
     <div id="left">
       <div class="scrollDiv boxedUpperLeft">
 
-        <div *ngIf="currentStep == 1 || currentStep == 5" style="font-size: 14px;">
-          <span>Things you can try to check how it works:</span>
+        <div *ngIf="currentStep == 1" style="font-size: 14px;">
+          <span>Things you can try to check how it works ( you can send images only ):</span>
           <br/>
           <br/>
           <span>In response to first question ( asking you to send your photo ) :</span>
@@ -20,7 +20,7 @@
           <span>- send photos with no human faces</span>
           <br/>
           <br/>
-          <span>Try to do all this saying that you have opposite gender and looking for person of same gender as yours. </span>
+          <span>Try to do all this saying that you have opposite gender and looking for person of same gender as yours (in 'Home - Find a match' page). </span>
           <br/>
           <br/>
           <span>In response to second question ( asking you to send celebrity photo ) :</span>
@@ -35,14 +35,21 @@
           <span>- send photos with no animals</span>
           <br/>
           <br/>
+          <span>If you do any of above in response to one question more than four times user will stop relations.</span>
+          <br/>
+          <br/>
+
           <span>Also try to type names and nicknames other than the pre-filled ones.</span>
         </div>
         <div *ngIf="currentStep == 2" style="font-size: 14px;">
-          <span>Face recognition process: ( except that instead of saving result to DynamoDB my Lambda returns directly to browser )
+          <span>Face recognition process: ( except that instead of saving result to DynamoDB [ it is not needed - image
+            IDs in S3 are derived from UserID ] Lambda function returns data to the browser. )
           </span>
           <br/>
           <!-- image source: https://aws.amazon.com/blogs/machine-learning/build-your-own-face-recognition-service-using-amazon-rekognition/ -->
           <img src="../../assets/face_recognition.png" width="96%;">
+          <br/>
+          <span>Image source - aws.amazon.com</span>
         </div>
 
         <div *ngIf="currentStep == 3" style="font-size: 14px;">
@@ -51,9 +58,10 @@
             <p>Current message mp3 file url: {{conversation[conversationStep].audio}}</p>
           </div>
           <br/>
-          <span>Below response (in JSON format) is all I get from AWS Rekognition. All the code that does actual analysis and generates response is
-            written by me :
-            <br/><br/> Labels:
+          <span>Below response (in JSON format) is all I get from AWS Rekognition. All the code that does actual analysis and generates
+            response is written by me :
+            <br/>
+            <br/> Labels:
             <pre>{{LabelsToDisplay | json}}</pre>
             <br/> Face Details:
             <pre>{{FaceDetailsToDisplay | json}}</pre>
@@ -66,7 +74,18 @@
         <div *ngIf="currentStep == 4" style="font-size: 14px;">
           <span>Audio file producing process: ( except that instead of SNS I used SQS ) </span>
           <br/>
-          <img src="../../assets/pollyProcess.png" width="80%;">
+          <img src="../../assets/pollyProcess.png" width="90%;">
+          <br/>
+          <span>image source - aws.amazon.com</span>
+        </div>
+        <div *ngIf="currentStep == 5" style="font-size: 14px;">
+          <span>Overall, 14 Lambda functions, 2 DynamoDb tables (one with Global Secondary Index), 11 API Gateway endpoints 6 Step function states are used.</span>
+          <br/>
+          <br/>
+          <span>All uploaded images, generated mp3 files and DynamoDB records (made on generated mp3 files) are auto-deleted in 20 mins from the time of FIRST audio generation. In subsequent times these Steps are started with the same ID and Choice step condition is not met and Choice step (isFirstWithNewID) selects EndNow step. IDs of all files/records to be deleted can be derived from ID of the very first ID (new ID).</span>
+          <br/><br/>
+          <span>( I know that I could do the same thing using CloudWatch Rules or Lambda cron jobs - doing it using Step functions was my personal preference )</span>
+          <img src="../../assets/stepChart.png" width="90%;">
         </div>
       </div>
       <div class="scrollDiv boxedBottomLeft">
@@ -76,7 +95,7 @@
           <div *ngIf="uploaderHidden">
             <span class="noDecor" (click)="onImageChangeRequest()">
               <span *ngIf="imageFile.length != 0">
-                Image from local file system received - click here to change the image
+                Image from local file system RECEIVED - click here to CHANGE the image
               </span>
               <span *ngIf="imageFile.length == 0">
                 Add image
@@ -174,7 +193,7 @@
                 <div style="text-align:left">
                   <div *ngIf="isNotValidURLprovided">
                     <br/>
-                    <p>Image URL is not valid !</p>
+                    <p>Image URL is not valid ! You can send images only.</p>
                     <p>Please right click on an image and use 'Copy image address' and NOT 'Copy link address'.</p>
                     <p>Pasted URL is
                       <span style="color:brown">auto-submitted</span> when valid image URL is recognized.</p>
@@ -226,20 +245,27 @@
                       <button class="buttonMessage" (click)="onPlayAudioClicked(aMessage.audio)">play audio</button>
                       <br/>
                     </span>
-                    <span *ngIf="AgeRange && conversationStep == ind && stepAtFunctionStart < 3">I guess
+                    <span *ngIf="AgeRange && conversationStep == ind && stepAtFunctionStart < 3">Thank you. I guess
                       <span *ngIf="AgeRange && stepAtFunctionStart == 1"> your age </span>
                       <span *ngIf="AgeRange && stepAtFunctionStart === 2"> the age of the person in photo </span>
                       is between
                       <span *ngIf="!showAge">
-                        <a class="addnlightbg" style="cursor: pointer;" (click)="canShowAge()">(show age range). </a>
+                        <a class="addnlightbg" style="cursor: pointer;" (click)="canShowAge()">(show age estimate). </a>
                       </span>
                       <span *ngIf="showAge">{{AgeRange}}. </span>
                     </span>
                     <span>{{aMessage.text}}</span>
-                    <div *ngIf="stepAtFunctionStart==5 && conversationStep == ind">
+                    <div *ngIf="stepAtFunctionStart==5 && conversationStep == ind && notSeriousCount > 4">
+                      <hr/>
+                      <p>[ You have been marked as 'Not Serious' by {{conversation[0].name}}. ]
+                      </p>
+                    </div>
+
+                    <div *ngIf="stepAtFunctionStart==5 && conversationStep == ind && notSeriousCount < 5">
                       <img src="../../assets/smile.png" width="14%;">
                       <img src="../../assets/kiss.png" width="14%;">
                       <hr/>
+
                       <p>[ You have been marked as Liked person by {{conversation[0].name}}. Congratulations! Your relationships
                         are confirmed now ]</p>
                     </div>

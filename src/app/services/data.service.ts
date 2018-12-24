@@ -161,7 +161,7 @@ export class DataService {
     });
   }
 
-  getInfoOnURLImage(type: string, id: string, imageUrl: string) {
+  getInfoOnURLImage(type: string, id: string, stepID: string, imageUrl: string) {
     // GET
     console.log('type', type);
     console.log('encodeURIComponent(imageUrl) = ', encodeURIComponent(imageUrl));
@@ -175,7 +175,7 @@ export class DataService {
           // + type
           + '?'
           + 'accessToken=' + session.getAccessToken().getJwtToken() + '&'
-          + 'candidateID=' + id + '&'
+          + 'candidateID=' + id + '-' + stepID + 'ULA&'
           // + 'requestorID=' + id + '&'
           + 'type=' + type + '&'
           + 'imageUrl=' + encodeURIComponent(imageUrl),
@@ -196,7 +196,7 @@ export class DataService {
     });
   }
 
-  postImage(image: any) {
+  postImage(image: any, stepID: string) {
 
     const that = this;
     const imageObj = { image: JSON.stringify(image) };
@@ -209,8 +209,9 @@ export class DataService {
         console.log('sending post');
         that.http.post(
           this.stageURL + this.extn3
-          + '?accessToken='
-          + session.getAccessToken().getJwtToken(),
+          + '?'
+          + 'candidateID=' + this.fymRequestID + '-' + stepID + 'ULA&'
+          + 'accessToken=' + session.getAccessToken().getJwtToken(),
           imageObj,
           {
             headers: new Headers({
