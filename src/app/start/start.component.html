@@ -72,17 +72,20 @@
           </span>
         </div>
         <div *ngIf="currentStep == 4" style="font-size: 14px;">
-          <span>Audio file producing process: ( except that instead of SNS I used SQS ) </span>
+          <span>Audio file producing (blue labels) and retrieval (red labels) process: ( except that instead of SNS I used SQS ) </span>
           <br/>
           <img src="../../assets/pollyProcess.png" width="90%;">
           <br/>
           <span>image source - aws.amazon.com</span>
         </div>
         <div *ngIf="currentStep == 5" style="font-size: 14px;">
-          <span>Overall, 14 Lambda functions, 2 DynamoDb tables (one with Global Secondary Index), 11 API Gateway endpoints 6 Step function states are used.</span>
+          <span>Overall, 8 Lambda functions, 2 DynamoDB tables (one with Global Secondary Index), 5 API Gateway endpoints and 6 Step states are used.</span>
+          <br/><br/>
+          <span>Entire serverless back end is based on one CloudFormation template (including API Gateway where Swagger definition is used, creation of Global Secondary Index and enabling SQS on a Lambda function).</span>
           <br/>
           <br/>
-          <span>All uploaded images, generated mp3 files and DynamoDB records (made on generated mp3 files) are auto-deleted in 20 mins from the time of FIRST audio generation. In subsequent times these Steps are started with the same ID and Choice step condition is not met and Choice step (isFirstWithNewID) selects EndNow step. IDs of all files/records to be deleted can be derived from ID of the very first ID (new ID).</span>
+          <span>All uploaded images or images copied from URLs, generated mp3 files and DynamoDB records (made on generated mp3 files) are auto-deleted in 20 mins from the time of FIRST audio generation. In subsequent times these Steps are started with the same ID and Choice step condition is not met and Choice step (isFirstWithNewID) selects EndNow step. IDs of all files/records to be deleted can be derived from ID of the very first ID (new ID).</span>
+          <a class="addnlightbg" style="font-size:14px;" target="_blank" href="https://github.com/aripovula/serverlessFramework/blob/master/fymDeleteDataIn20Mins.js"> ( source code of this Lambda function )</a>
           <br/><br/>
           <span>( I know that I could do the same thing using CloudWatch Rules or Lambda cron jobs - doing it using Step functions was my personal preference )</span>
           <img src="../../assets/stepChart.png" width="90%;">

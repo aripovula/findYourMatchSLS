@@ -13,9 +13,7 @@ export class DataService {
   fymResponseData;
   fymCriteriaSet;
   findMatchRequest: FindMatchRequest;
-  stageURL =
-    // 'https://edv8edmxxj.execute-api.us-east-2.amazonaws.com/development';
-    'https://lmpyzv9fz8.execute-api.us-east-1.amazonaws.com/development';
+  stageURL = 'https://qlcxvd8ck7.execute-api.us-east-1.amazonaws.com/development';
   extn1 = '/find-your-match';
   extn2 = '/start-relations/audio';
   extn3 = '/start-relations/imagerekog';
@@ -90,6 +88,7 @@ export class DataService {
     this.fymCriteriaSet = criteriaSet;
     if (type === 'single') { this.fymRequestID = id; }
     console.log('type', type);
+    console.log('criteriaSet', criteriaSet);
     const that = this;
     return new Promise((resolve, reject) => {
       this.authService.getCurrentUser().getSession((err, session) => {
