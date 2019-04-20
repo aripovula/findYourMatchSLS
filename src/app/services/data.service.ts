@@ -13,7 +13,7 @@ export class DataService {
   fymResponseData;
   fymCriteriaSet;
   findMatchRequest: FindMatchRequest;
-  stageURL = 'https://qlcxvd8ck7.execute-api.us-east-1.amazonaws.com/development';
+  stageURL = 'https://u0mkl5n2l9.execute-api.us-east-1.amazonaws.com/development';
   extn1 = '/find-your-match';
   extn2 = '/start-relations/audio';
   extn3 = '/start-relations/imagerekog';

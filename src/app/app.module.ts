@@ -22,7 +22,7 @@ import { StartComponent } from './start/start.component';
 import { ProfileComponent } from './profile/profile.component';
 import { SourceComponent } from './source/source.component';
 
-const appRoutes: Routes = [
+export const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'start', component: StartComponent, canActivate: [AuthGuard] },

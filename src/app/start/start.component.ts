@@ -211,6 +211,9 @@ export class StartComponent implements OnInit {
           })
           .catch((err) => {
             console.log('Rekog err = ', err);
+            let text = 'Hey, something is wrong ! My computer does not work as expected ! ';
+            text = text + ' ( please make sure that you have not copied image URL from Google ';
+            text = text + 'search result - url would be too long. Visit image page and then copy image url )';
             this.conversationStep++;
             this.conversation[this.conversationStep] = {
               step: this.conversationStep,
@@ -218,7 +221,7 @@ export class StartComponent implements OnInit {
               name: null,
               image: null,
               audio: null,
-              text: 'Hey, something is wrong ! My computer does not work as expected !'
+              text
             };
             this.onNewMessage();
           });
