@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ImageUploadModule } from 'angular2-image-upload';
 import { NgxLoadingModule } from 'ngx-loading';
 import { APP_BASE_HREF } from '@angular/common';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -53,6 +54,7 @@ describe('AppComponent', () => {
         BrowserModule,
         ReactiveFormsModule,
         HttpModule,
+        RouterTestingModule,
         RouterModule.forRoot(
           appRoutes
         ),

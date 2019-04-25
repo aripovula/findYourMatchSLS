@@ -86,6 +86,7 @@ export class ProfileComponent {
     const petPref = this.assignRandom(this.lovePets);
     const genderSf = this.cognitoService.cognitoUser.getUsername() === 'Ann' ? 'female' : 'male';
     const genderFd = this.cognitoService.cognitoUser.getUsername() === 'Ann' ? 'male' : 'female';
+    // tslint:disable-next-line:max-line-length
     const names = this.cognitoService.cognitoUser.getUsername() === 'Ann' ? this.namesF : this.namesM;
     const name = this.assignRandom(names);
     this.myHobbies = '';

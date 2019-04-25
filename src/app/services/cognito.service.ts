@@ -99,6 +99,7 @@ export class CognitoService {
   }
 
   getCurrentUser() {
+    console.log('getCurrentUser11-', this.userPool.getCurrentUser());
     return this.userPool.getCurrentUser();
   }
 
