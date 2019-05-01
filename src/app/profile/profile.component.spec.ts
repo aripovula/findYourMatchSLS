@@ -25,12 +25,6 @@ import { StartComponent } from '../start/start.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { SourceComponent } from '../source/source.component';
 
-class FakeCognitoService extends CognitoService {
-  getCurrentUser2() {
-    return { CognitoUser: ''};
-  }
-}
-
 export const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
@@ -119,5 +113,14 @@ describe('ProfileComponent', () => {
     // to be added
 
 
+  });
+
+  it('should render title in a h4 tag', () => {
+    const fixture2 = TestBed.createComponent(ProfileComponent);
+    fixture2.detectChanges();
+    const compiled = fixture2.debugElement.nativeElement;
+    // expect('#firstName').toBeDefined;
+    // expect(compiled(by.id('my-id')).isPresent()).toBe(true);
+    expect(compiled.querySelector('#firstName').textContent).toContain('First name');
   });
 });

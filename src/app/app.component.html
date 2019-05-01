@@ -5,13 +5,13 @@
 
     <nav>
       <span class="horIndent"></span>
-      <a class="header__title" routerLink="/home" routerLinkActive="active-link">Home - find a match</a>
-      <span class="horIndent"></span>
-      <a class="header__title" routerLink="/start" routerLinkActive="active-link">Start relations</a>
-      <span class="horIndent"></span>
-      <a class="header__title" routerLink="/all_users_admin_only" routerLinkActive="active-link">All users</a>
-      <span class="horIndent"></span>
       <span *ngIf="isLoggedIn">
+        <a class="header__title" routerLink="/home" routerLinkActive="active-link">Home - find a match</a>
+        <span class="horIndent"></span>
+        <a class="header__title" routerLink="/start" routerLinkActive="active-link">Start relations</a>
+        <span class="horIndent"></span>
+        <a class="header__title" routerLink="/all_users_admin_only" routerLinkActive="active-link">All users</a>
+        <span class="horIndent"></span>
         <a class="header__title" style="cursor: pointer;" (click)="onLogoutClicked()">Logout</a>
 
         <span *ngIf="username">
